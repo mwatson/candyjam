@@ -141,13 +141,15 @@ App.init = function() {
                 // the maps (first one is the title screen)
                 world: [{
 
-                        tileSize: 64, 
+                        tileSize: 96, 
                         width: 32, 
                         height: 32, 
+
+                        mapSize: 1000, 
                         
                         playerStart: {
-                                x: 300, 
-                                y: 300
+                                x: 16 * 96, 
+                                y: 16 * 96
                         }, 
 
                         // define the colors of the bg tiles

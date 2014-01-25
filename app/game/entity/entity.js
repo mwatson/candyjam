@@ -164,7 +164,7 @@ Entity Components:
                                                         xStep = s1 * App.World.map.tileSize - en.attrs.width - 1;
                                                 } else if(xDir == -1) {
                                                         xStep = s1 * App.World.map.tileSize + App.World.map.tileSize;
-                                                }
+                                                };
                                                 en.attrs.dir.x = 0;
                                                 collisions.push({ type: 'map', x: s1, y: yRows[i] });
                                         }
@@ -229,5 +229,15 @@ Entity Components:
         };
 
         root.App.Objects.Components.Movable = movable;
+
+        var isPlayer = function(entity, settings) {
+        };
+
+        root.App.Objects.Components.IsPlayer = isPlayer;
+
+        var projectile = function(entity, settings) {
+        };
+
+        root.App.Objects.Components.Projectile = projectile;
 
 })(this);

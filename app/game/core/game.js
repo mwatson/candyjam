@@ -284,10 +284,14 @@
                         }
 
                         newPos = player.c('Movable').move(xDir, yDir);
-                        collisions = player.c('Collidable').checkMapCollision(newPos.x, newPos.y);
-                        
-                        if(!collisions.length) {
+                        if(player.is('Collidable')) {
+                                collisions = player
+                                                .c('Collidable')
+                                                .checkMapCollision(newPos.x, newPos.y);
                         }
+                        
+                        //if(!collisions.length) {
+                        //}
                 };
         };
         

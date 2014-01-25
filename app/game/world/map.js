@@ -115,55 +115,63 @@
                         this.dPaths.player = [];
                 };
 
-                this.generateBlockers = function(width, height) {
+                this.generateBlockers = function(width, height, mapSize) {
                         // generate an empty map grid
-                        var grid = [], val, x = 0, y = 0, h = false;
+                        var grid = [], val, x = 0, y = 0, dir;
                         for(y = 0; y < height; y++) {
                                 grid.push([]);
                                 for(x = 0; x < width; x++) {
-                                        val = 0;
-                                        if(App.Tools.rand(0, 100) < 45) {
-                                                val = 1;
-                                        }
-                                        grid[y].push(val);
+                                        grid[y].push(1);
                                 }
                         }
 
-                        for(var i = 0; i < 40000; i++) {
-                                x = App.Tools.rand(0, width - 1);
-                                y = App.Tools.rand(0, height - 1);
+                        x = Math.floor(width / 2);
+                        y = Math.floor(height / 2);
+                        for(var i = 0; i < mapSize; i++) {
 
-                                var closedNeighborCount = 0;
-                                for(var ny = -1; ny <= 1; ny++) {
-                                        if(_.isUndefined(grid[y + ny])) {
+                                grid[y][x] = 0;
+                                
+                                while(1) {
+                                        dir = App.Tools.rand(0, 3);
+                                        if(dir == 0 && x <= 1) {
                                                 continue;
                                         }
-                                        for(var nx = -1; nx <= 1; nx++) {
-                                                if(_.isUndefined(grid[y + ny][x + nx])) {
-                                                        continue;
-                                                }
-
-                                                if(grid[y + ny][x + nx] == 1) {
-                                                        closedNeighborCount++;
-                                                }
+                                        if(dir == 1 && x >= width - 2) {
+                                                continue;
                                         }
+                                        if(dir == 2 && y >= height - 2) {
+                                                continue;
+                                        }
+                                        if(dir == 3 && y <= 1) {
+                                                continue;
+                                        }
+                                        break;
                                 }
 
-                                if(closedNeighborCount > 4) {
-                                        grid[y][x] = 1;
-                                } else {
-                                        grid[y][x] = 0;
+                                switch(dir) {
+                                        case 0: // N 
+                                                x -= 1;
+                                                break;
+                                        case 1: // S
+                                                x += 1;
+                                                break;
+                                        case 2: // W
+                                                y += 1;
+                                                break;
+                                        case 3: // E
+                                                y -= 1;
+                                                break;
                                 }
                         }
 
-                        // some post-processing
+                        // some post-processing (fill in two two surrounding rows)
                         for(y = 0; y < height; y++) {
                                 for(x = 0; x < width; x++) {
-                                        if(y == 0 || x == 0) {
+                                        if(y <= 1 || x <= 1) {
                                                 grid[y][x] = 1;
                                         }
 
-                                        if(y == height - 1 || x == width - 1) {
+                                        if(y >= height - 2 || x >= width - 2) {
                                                 grid[y][x] = 1;
                                         }
                                 }
@@ -468,8 +476,10 @@
                                         this.quadtree[i].w, 
                                         this.quadtree[i].h
                                 )) {
-                                        entity.c('Collidable').quadIds.push(i);
-                                        this.quadtree[i].addChild(props.id - 1);
+                                        if(entity.is('Collidable')) {
+                                                entity.c('Collidable').quadIds.push(i);
+                                                this.quadtree[i].addChild(props.id - 1);
+                                        }
                                 }
                         }
 
@@ -563,14 +573,22 @@
 
                         // generate the map
                         if(!settings.blockers.length) {
-                                self.grid = self.generateBlockers(settings.width, settings.height);     
+                                self.grid = self.generateBlockers(
+                                        settings.width, 
+                                        settings.height, 
+                                        settings.mapSize
+                                );
                         } else {
                                 self.grid = settings.blockers;
                         }
                         self.processGrid();
 
                         // spawn the player
-                        self.spawn('player', self.playerSpawn.x, self.playerSpawn.y);
+                        self.spawn(
+                                'player', 
+                                self.playerSpawn.x + Math.floor(App.Defaults.Entity.player.width / 4), 
+                                self.playerSpawn.y + Math.floor(App.Defaults.Entity.player.height / 4)
+                        );
                         App.Player.playerEnt = self.entities[0];
 
                         if(!_.isUndefined(settings.loaded)) {

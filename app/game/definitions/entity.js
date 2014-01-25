@@ -7,9 +7,8 @@
                 //
 
                 player: {
-                        class: 'player', 
-                        width: 63, 
-                        height: 63, 
+                        width: 64, 
+                        height: 64, 
                         speed: 8, 
                         components: {
                                 Renderable: {
@@ -38,6 +37,8 @@
                                 Movable: {
                                 }, 
                                 Collidable: {
+                                }, 
+                                Projectile: {
                                 }
                         }
                 }
