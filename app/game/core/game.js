@@ -247,17 +247,13 @@
                         // run all entity timers and behaviors
                         for(var i = 0; i < App.World.map.entities.length; i++) {
 
-                                if(excludePlayer && App.World.map.entities[i].attrs.class == 'player') {
+                                if(excludePlayer && App.World.map.entities[i].is('IsPlayer')) {
                                         continue;
                                 }
                                 
-                                if(App.World.map.entities[i].behavior) {
-                                        if(!_.isUndefined(App.World.map.entities[i].behavior.run)) {
-                                                App.World.map.entities[i].behavior.run();
-                                        }
+                                if(App.World.map.entities[i].is('IsEnemy')) {
+                                        App.World.map.entities[i].c('IsEnemy').behavior();
                                 }
-
-                                //App.World.map.entities[i].runTimers(this.gameTicks());
                         }
                 };
 
@@ -285,9 +281,8 @@
 
                         newPos = player.c('Movable').move(xDir, yDir);
                         if(player.is('Collidable')) {
-                                collisions = player
-                                                .c('Collidable')
-                                                .checkMapCollision(newPos.x, newPos.y);
+                                collisions = player.c('Collidable')
+                                                   .checkMapCollision(newPos.x, newPos.y);
                         }
                         
                         //if(!collisions.length) {

@@ -374,8 +374,8 @@
                                 for(x = 0; x < this.grid[y].length; x++) {
                                         if(this.grid[y][x]) {
                                                 App.Draw.get('entity').fillRect(
-                                                        x * this.tileSize, 
-                                                        y * this.tileSize, 
+                                                        x * this.tileSize,
+                                                        y * this.tileSize,
                                                         this.tileSize, 
                                                         this.tileSize, 
                                                         '#D60000'
@@ -385,11 +385,12 @@
                         }
 
                         for(i = 0; i < this.entities.length; i++) {
-                                if(this.entities[i].attrs.type != 'player') {
+                                if(!this.entities[i].is('IsPlayer') && this.entities[i].is('Renderable')) {
                                         this.entities[i].c('Renderable').draw(interpolation, null, moveDelta);
                                 }
                         }
 
+                        // hopefully the player is always renderable
                         this.entities[0].c('Renderable').draw(interpolation, null, moveDelta);
 
                         if(App.Game.settings.debug.showQuadTree) {

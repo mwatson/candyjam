@@ -200,8 +200,6 @@ Entity Components:
                                 }
                         }
 
-                        en.setPosition(xStep, yStep);
-
                         return collisions;
                 }
         };
@@ -224,6 +222,11 @@ Entity Components:
                         xStep += ~~(xDir * (en.attrs.speed * App.Game.moveDelta));
                         yStep += ~~(yDir * (en.attrs.speed * App.Game.moveDelta));
 
+                        if(en.is('Collidable')) {
+                                en.c('Collidable')
+                                  .checkMapCollision(xStep, yStep);
+                        }
+
                         return { x: xStep, y: yStep };
                 };
         };
@@ -239,5 +242,20 @@ Entity Components:
         };
 
         root.App.Objects.Components.Projectile = projectile;
+
+        var isEnemy = function(entity, settings) {
+
+                this.en = entity;
+
+                this.behavior = function() {
+                        return 1;
+                };
+
+                if(settings.behavior) {
+                        this.behavior = settings.behavior;
+                }
+        };
+
+        root.App.Objects.Components.IsEnemy = isEnemy;
 
 })(this);
