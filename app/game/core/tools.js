@@ -74,13 +74,13 @@
                                         var c = document.createElement('canvas'), 
                                             ctx;
                                         c.id = asset.name;
-                                        c.width = this.width * 2;
+                                        c.width = this.width;
                                         c.height = this.height;
                                         ctx = c.getContext('2d');
                                         
                                         ctx.drawImage(App.Assets.Images[asset.name], 0, 0);
-                                        ctx.scale(-1, 1);
-                                        ctx.drawImage(App.Assets.Images[asset.name], -c.width, 0);
+                                        //ctx.scale(-1, 1);
+                                        //ctx.drawImage(App.Assets.Images[asset.name], -c.width, 0);
 
                                         App.Assets.Images[asset.name] = c;
                                         App.Defs.Assets.Loaded.Images++;
@@ -111,13 +111,14 @@
                 };
 
                 this.assetFontCheck = function() {
-                        var w;
+                        var w, self = this;
                         _.each(App.Defs.Assets.Fonts, function(asset, id) {
                                 if(!App.Assets.Fonts[asset.name].loaded) {
                                         w = App.Draw.get('hud').measureText('amazing awesome!', '24px ' + asset.name);
                                         if(App.Assets.Fonts[asset.name].initWidth.width != w.width) {
                                                 App.Assets.Fonts[asset.name].loaded = true;
                                                 App.Defs.Assets.Loaded.Fonts++;
+                                                App.Defs.Assets.Loaded.Complete = self.assetsCheckComplete();
                                         }
                                 }
                         });
@@ -135,8 +136,8 @@
                         _.each(App.Defs.Assets.CompositeImages, function(asset, id) {
                                 var c = document.createElement('canvas');
                                 c.id = asset.name;
-                                c.width = App.Assets.Images[asset.images[0]].width;
-                                c.height = App.Assets.Images[asset.images[0]].height;
+                                c.width = App.Assets.Images[asset.images[0].frame].width;
+                                c.height = App.Assets.Images[asset.images[0].frame].height;
 
                                 self.compositeImages(asset.images, c);
 
@@ -158,7 +159,11 @@
                                 if(!images[i]) {
                                         continue;
                                 }
-                                ctx.drawImage(App.Assets.Images[images[i]], 0, 0);
+                                ctx.drawImage(
+                                        App.Assets.Images[images[i].frame],
+                                        images[i].offset.x,
+                                        images[i].offset.y
+                                );
                         }
                         return true;
                 };

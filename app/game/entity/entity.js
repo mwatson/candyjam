@@ -31,6 +31,8 @@ Entity Components:
                         }
                 };
 
+                this.state = 'idle';
+
                 this.center = function() {
                         return {
                                 x: this.attrs.x + this.attrs.width / 2, 
@@ -77,6 +79,13 @@ Entity Components:
                         this.attrs.y = y;
                 };
 
+                this.changeState = function(newState, callback) {
+                        this.state = newState;
+                        if(callback) {
+                                callback();
+                        }
+                };
+
                 this.init = (function(settings, self){
 
                         self.attrs.width = settings.width;
@@ -99,7 +108,9 @@ Entity Components:
         var renderable = function(entity, settings) {
 
                 this.attrs = {
-                        color: settings.color
+                        color: settings.color,
+                        sprites: _.isUndefined(settings.sprites) ? false : App.Defs.Sprites[settings.sprites], 
+                        shadow: _.isUndefined(settings.shadow) ? false : settings.shadow
                 };
 
                 var en = entity;
@@ -114,13 +125,56 @@ Entity Components:
                                 canvasId = 'entity';
                         }
 
-                        App.Draw.get(canvasId).fillRect(
-                                en.attrs.x + en.attrs.dir.x * en.attrs.speed * interpolation * moveDelta, 
-                                en.attrs.y + en.attrs.dir.y * en.attrs.speed * interpolation * moveDelta, 
-                                en.attrs.width, 
-                                en.attrs.height, 
-                                this.attrs.color
-                        );
+                        var xPos = en.attrs.x + en.attrs.dir.x * en.attrs.speed * interpolation * moveDelta, 
+                            yPos = en.attrs.y + en.attrs.dir.y * en.attrs.speed * interpolation * moveDelta;
+
+                        // draw their shadow
+                        if(this.attrs.shadow) {
+                                App.Draw.get(canvasId).drawImg(
+                                        this.attrs.shadow, 
+                                        xPos, 
+                                        yPos + en.attrs.height - 8
+                                );
+                        }
+
+                        if(this.attrs.sprites) {
+
+                                // figure out the frame based on the state
+                                var curState = 'idle';
+                                if(en.state == 'walk') {
+
+                                        if(en.attrs.dir.x == 1) {
+                                                curState = 'walkRight';
+                                        } else if(en.attrs.dir.x == -1) {
+                                                curState = 'walkLeft';
+                                        }
+
+                                        if(_.isUndefined(this.attrs.sprites[curState])) {
+                                                curState = 'walk';
+                                        }
+                                }
+
+                                if(_.isUndefined(this.attrs.sprites[curState])) {
+                                        curState = 'idle';
+                                }
+
+                                App.Draw.get(canvasId).drawImg(
+                                        this.attrs.sprites[curState][0].frame, 
+                                        xPos, 
+                                        yPos
+                                );
+
+
+                        } else {
+
+                                App.Draw.get(canvasId).fillRect(
+                                        xPos, 
+                                        yPos, 
+                                        en.attrs.width, 
+                                        en.attrs.height, 
+                                        this.attrs.color
+                                );
+                        }
                 };
         };
 
@@ -200,7 +254,7 @@ Entity Components:
                                 }
                         }
 
-                        return collisions;
+                        return { collisions: collisions, x: xStep, y: yStep };
                 }
         };
 
@@ -213,7 +267,8 @@ Entity Components:
                 this.move = function(xDir, yDir) {
 
                         var xStep = en.attrs.x, 
-                            yStep = en.attrs.y;
+                            yStep = en.attrs.y, 
+                            newPos;
 
                         // set the directions on the entity
                         en.attrs.dir.x = xDir;
@@ -223,8 +278,17 @@ Entity Components:
                         yStep += ~~(yDir * (en.attrs.speed * App.Game.moveDelta));
 
                         if(en.is('Collidable')) {
-                                en.c('Collidable')
-                                  .checkMapCollision(xStep, yStep);
+                                newPos = en.c('Collidable').checkMapCollision(xStep, yStep);
+                        } else {
+                                newPos = { x: xPos, y: yPos };
+                        }
+                        
+                        en.setPosition(newPos.x, newPos.y);
+
+                        if(xDir !== 0) {
+                                en.changeState('walk');
+                        } else {
+                                en.changeState('idle');
                         }
 
                         return { x: xStep, y: yStep };

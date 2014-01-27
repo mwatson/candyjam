@@ -12,7 +12,9 @@
                         speed: 8, 
                         components: {
                                 Renderable: {
-                                        color: '#FF2828'
+                                        color: '#FF2828', 
+                                        sprites: 'player', 
+                                        shadow: 'shadow_64'
                                 }, 
                                 Movable: {
                                 }, 
@@ -48,7 +50,9 @@
                         speed: 4, 
                         components: {
                                 Renderable: {
-                                        color: '#0C0'
+                                        color: '#0C0', 
+                                        sprites: 'grunt', 
+                                        shadow: 'shadow_64'
                                 }, 
                                 Movable: {
                                 }, 
@@ -61,15 +65,15 @@
                                                     yDir = 0, 
                                                     newPos;
 
-                                                if(this.en.attrs.x > player.attrs.x) {
+                                                if(this.en.attrs.x > player.attrs.x && this.en.attrs.x - player.attrs.x > 16) {
                                                         xDir = -1;
-                                                } else if(this.en.attrs.x < player.attrs.x) {
+                                                } else if(this.en.attrs.x < player.attrs.x && player.attrs.x - this.en.attrs.x > 16) {
                                                         xDir = 1;
                                                 }
 
-                                                if(this.en.attrs.y > player.attrs.y) {
+                                                if(this.en.attrs.y > player.attrs.y && this.en.attrs.y - player.attrs.y > 16) {
                                                         yDir = -1;
-                                                } else if(this.en.attrs.y < player.attrs.y) {
+                                                } else if(this.en.attrs.y < player.attrs.y && player.attrs.y - this.en.attrs.y > 16) {
                                                         yDir = 1;
                                                 }
 

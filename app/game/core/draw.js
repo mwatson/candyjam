@@ -391,13 +391,13 @@
                                 if(this.checkCoords(coords.x, coords.y, App.Assets.Images[assetName].width, App.Assets.Images[assetName].height)) {
                                         this.ctx.drawImage(
                                                 App.Assets.Images[assetName], 
-                                                xDir == -1 ? App.Assets.Images[assetName].width / 2 : 0, 
                                                 0, 
-                                                App.Assets.Images[assetName].width / 2, 
+                                                0, 
+                                                App.Assets.Images[assetName].width, 
                                                 App.Assets.Images[assetName].height, 
                                                 coords.x, 
                                                 coords.y, 
-                                                App.Assets.Images[assetName].width / 2, 
+                                                App.Assets.Images[assetName].width, 
                                                 App.Assets.Images[assetName].height
                                         );
                                         return true;

@@ -41,6 +41,9 @@
                         // init player
                         App.Player.init();
 
+                        // Load assets
+                        App.Tools.assetLoader();
+
                         gameRunning = true;
 
                         this.skipTicks = ~~(1000 / this.settings.updatecap);
@@ -55,7 +58,7 @@
                 };
 
                 this.prevState = '';
-                this.gameState = 'gameplay';
+                this.gameState = 'loading';
                 this.newState = null;
                 
                 // use this to change the gamestate. it will 
@@ -125,7 +128,7 @@
                         }
                         this.interpolation = 0;
 
-                        if(1) { //App.Defs.Assets.Loaded.Complete) {
+                        if(App.Defs.Assets.Loaded.Complete) {
                                 this.drawOps();
                         }
  
@@ -219,9 +222,16 @@
                                 //App.Draw.setResolution();
                         }
 
-                        App.Draw.runTransitions();
+                        if(this.gameState == 'loading') {
+                                App.Tools.assetFontCheck();
+                                if(App.Defs.Assets.Loaded.Complete) {
+                                        this.setGameState('gameplay');
+                                }
+                        } else if(this.gameState == 'gameplay') {
+                                this.gameplayOps();
+                        }
 
-                        this.gameplayOps();
+                        App.Draw.runTransitions();
 
                         //
                         // keep this stuff at the end of the loop
@@ -262,7 +272,7 @@
                             xDir = 0, 
                             yDir = 0, 
                             newPos = {}, 
-                            collisions = null;
+                            collisions = [];
 
                         if(App.Controls.keyDown('A') || App.Controls.keyDown('ARROW_LEFT')) {
                                 xDir -= 1;
@@ -280,13 +290,6 @@
                         }
 
                         newPos = player.c('Movable').move(xDir, yDir);
-                        if(player.is('Collidable')) {
-                                collisions = player.c('Collidable')
-                                                   .checkMapCollision(newPos.x, newPos.y);
-                        }
-                        
-                        //if(!collisions.length) {
-                        //}
                 };
         };
         

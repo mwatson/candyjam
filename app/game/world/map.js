@@ -370,20 +370,6 @@
                                 }
                         }
 
-                        for(y = 0; y < this.grid.length; y++) {
-                                for(x = 0; x < this.grid[y].length; x++) {
-                                        if(this.grid[y][x]) {
-                                                App.Draw.get('entity').fillRect(
-                                                        x * this.tileSize,
-                                                        y * this.tileSize,
-                                                        this.tileSize, 
-                                                        this.tileSize, 
-                                                        '#D60000'
-                                                );
-                                        }
-                                }
-                        }
-
                         for(i = 0; i < this.entities.length; i++) {
                                 if(!this.entities[i].is('IsPlayer') && this.entities[i].is('Renderable')) {
                                         this.entities[i].c('Renderable').draw(interpolation, null, moveDelta);
@@ -392,6 +378,38 @@
 
                         // hopefully the player is always renderable
                         this.entities[0].c('Renderable').draw(interpolation, null, moveDelta);
+
+                        for(y = 0; y < this.grid.length; y++) {
+                                for(x = 0; x < this.grid[y].length; x++) {
+                                        if(this.grid[y][x]) {
+                                                App.Draw.get('entity').fillRect(
+                                                        x * this.tileSize,
+                                                        y * this.tileSize - 32,
+                                                        this.tileSize, 
+                                                        this.tileSize, 
+                                                        '#D60000'
+                                                );
+
+                                                App.Draw.get('background').fillRect(
+                                                        x * this.tileSize,
+                                                        (y * this.tileSize - 32) + this.tileSize,
+                                                        this.tileSize, 
+                                                        64, 
+                                                        '#660000'
+                                                );
+                                                
+                                                // Shadow
+                                                App.Draw.get('background').fillRect(
+                                                        x * this.tileSize,
+                                                        (y * this.tileSize - 32) + this.tileSize + 64,
+                                                        this.tileSize, 
+                                                        24, 
+                                                        //'#b68989'
+                                                        'rgba(0,0,0,0.25)'
+                                                );
+                                        }
+                                }
+                        }
 
                         if(App.Game.settings.debug.showQuadTree) {
                                 for(i = 0; i < this.quadtree.length; i++) {

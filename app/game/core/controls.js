@@ -24,6 +24,9 @@
                         ENTER: 13, 
                         TILDE: 192
                 };
+
+                this.mouse = {
+                };
                 
                 this.controls = {};
 
@@ -42,6 +45,12 @@
                 }, 
                 setKeyInactive = function(index)             {
                         App.Controls.controls[index] = App.Controls.keyStates.UP;
+                }, 
+                setMouseDown = function(button) {
+                }, 
+                setMouseUp = function(button) {
+                }, 
+                setMouseInactive = function(button) {
                 };
 
                 // use these functions to check for key presses (you don't need to use .check())
