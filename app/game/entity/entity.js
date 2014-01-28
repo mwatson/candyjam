@@ -175,6 +175,21 @@ Entity Components:
                                         this.attrs.color
                                 );
                         }
+
+                        /*
+                        var bbox = en.c('Collidable').bBox, 
+                            axes = [ 'x', 'y' ];
+
+                        for(var i = 0; i < axes.length; i++) {
+                                App.Draw.get(canvasId).fillRect(
+                                        bbox.x(axes[i]), 
+                                        bbox.y(axes[i]), 
+                                        bbox.w(axes[i]), 
+                                        bbox.h(axes[i]), 
+                                        '#000'
+                                );
+                        }
+                        */
                 };
         };
 
@@ -187,7 +202,55 @@ Entity Components:
 
                 this.quadIds = [];
 
+                // default bounding box
+                this.bBox = {
+                        x: function(axis) {
+                                return en.attrs.x;
+                        }, 
+                        xStep: function(axis, position) {
+                                return position;
+                        }, 
+                        y: function(axis) {
+                                return en.attrs.y;
+                        },
+                        yStep: function(axis, position) {
+                                return position;
+                        },
+                        w: function(axis) {
+                                return en.attrs.width;
+                        }, 
+                        h: function(axis) {
+                                return en.attrs.height;
+                        }
+                };
+
+                if(!_.isUndefined(settings.method)) {
+                        if(settings.method == 'cross') {
+                                this.bBox = {
+                                        x: function(axis) {
+                                                return en.attrs.x + settings.setup[axis].x;
+                                        }, 
+                                        xStep: function(axis, position) {
+                                                return position + settings.setup[axis].x;
+                                        }, 
+                                        y: function(axis) {
+                                                return en.attrs.y + settings.setup[axis].y;
+                                        },
+                                        yStep: function(axis, position) {
+                                                return position + settings.setup[axis].y;
+                                        }, 
+                                        w: function(axis) {
+                                                return settings.setup[axis].width;
+                                        }, 
+                                        h: function(axis) {
+                                                return settings.setup[axis].height;
+                                        }
+                                };
+                        }
+                }
+
                 this.checkMapCollision = function(xStep, yStep) {
+
                         var xMin = 0, 
                             yMin = 0, 
                             xDir = en.attrs.dir.x, 
@@ -198,14 +261,14 @@ Entity Components:
 
                         // minimum for the x-axis
                         if(xDir > 0) {
-                                xMin = xStep + en.attrs.width;
+                                xMin = xStep + this.bBox.w('x');
                         } else if(xDir < 0) {
                                 xMin = xStep;
                         }
 
                         if(xDir != 0) {
-                                s1 = Math.floor(en.attrs.y / App.World.map.tileSize);
-                                s2 = Math.floor((en.attrs.y + en.attrs.height) / App.World.map.tileSize);
+                                s1 = Math.floor(this.bBox.y('x') / App.World.map.tileSize);
+                                s2 = Math.floor((this.bBox.y('x') + this.bBox.h('x')) / App.World.map.tileSize);
                                 for(i = s1; i <= s2; i++) {
                                         yRows.push(i);
                                 }
@@ -215,7 +278,7 @@ Entity Components:
                                         if(_.isUndefined(App.World.map.grid[yRows[i]])) {
                                         } else if(App.World.map.grid[yRows[i]][s1] !== false) {
                                                 if(xDir == 1) {
-                                                        xStep = s1 * App.World.map.tileSize - en.attrs.width - 1;
+                                                        xStep = s1 * App.World.map.tileSize - this.bBox.w('x') - 1;
                                                 } else if(xDir == -1) {
                                                         xStep = s1 * App.World.map.tileSize + App.World.map.tileSize;
                                                 };
@@ -227,14 +290,14 @@ Entity Components:
 
                         // min for the y-axis
                         if(yDir > 0) {
-                                yMin = yStep + en.attrs.height;
+                                yMin = yStep + this.bBox.h('y');
                         } else if(yDir < 0) {
                                 yMin = yStep;
                         }
 
                         if(yDir != 0) {
-                                s1 = Math.floor(xStep / App.World.map.tileSize);
-                                s2 = Math.floor((xStep + en.attrs.width) / App.World.map.tileSize);
+                                s1 = Math.floor(this.bBox.xStep('y', xStep) / App.World.map.tileSize);
+                                s2 = Math.floor((this.bBox.xStep('y', xStep) + this.bBox.w('y')) / App.World.map.tileSize);
                                 for(i = s1; i <= s2; i++) {
                                         xCols.push(i);
                                 }
@@ -244,7 +307,7 @@ Entity Components:
                                         if(_.isUndefined(App.World.map.grid[s1])) {
                                         } else if(App.World.map.grid[s1][xCols[i]] !== false) {
                                                 if(yDir == 1) {
-                                                        yStep = s1 * App.World.map.tileSize - en.attrs.height - 1;
+                                                        yStep = s1 * App.World.map.tileSize - this.bBox.h('y') - 1;
                                                 } else if(yDir == -1) {
                                                         yStep = s1 * App.World.map.tileSize + App.World.map.tileSize;
                                                 }

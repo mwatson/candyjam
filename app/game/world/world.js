@@ -10,16 +10,19 @@
                 this.map = null;
 
                 this.loadMap = function(mapId) {
+                        if(_.isUndefined(maps[mapId])) {
+                                console.log('Map not found');
+                                return;
+                        }
+
                         if(!_.isNull(this.map)) {
                                 this.map.destroy();
                                 delete this.map;
                                 this.map = null;
                         }
-
-                        if(!_.isUndefined(maps[mapId])) {
-                                this.mapId = mapId;
-                                this.createMap(maps[this.mapId]);
-                        }
+                        
+                        this.mapId = mapId;
+                        this.createMap(maps[this.mapId]);
                 };
 
                 this.createMap = function(settings) {

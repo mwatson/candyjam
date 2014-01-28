@@ -55,19 +55,19 @@
                         { name: 'grunt_idle_frame01', 
                           images: [ 
                                 { frame: 'grunt_base01', offset: { x: 0, y: 0 } }, 
-                                { frame: 'grunt_shades01', offset: { x: 6, y: 20 } }
+                                { frame: 'grunt_shades01', offset: { x: 8, y: 16 } }
                           ]
                         }, 
                         { name: 'grunt_right_frame01', 
                           images: [ 
                                 { frame: 'grunt_base01', offset: { x: 0, y: 0 } }, 
-                                { frame: 'grunt_shades01', offset: { x: 10, y: 20 } }
+                                { frame: 'grunt_shades01', offset: { x: 12, y: 16 } }
                           ]
                         },
                         { name: 'grunt_left_frame01', 
                           images: [ 
                                 { frame: 'grunt_base01', offset: { x: 0, y: 0 } }, 
-                                { frame: 'grunt_shades01', offset: { x: 0, y: 20 } }
+                                { frame: 'grunt_shades01', offset: { x: 4, y: 16 } }
                           ]
                         },
                 ], 

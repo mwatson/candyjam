@@ -45,8 +45,6 @@
                         fgTileColor = rowMap.r_0.fgColor;
                         bgTileColor = rowMap.r_0.bgColor;
 
-                        gridMap = this.generateBlockers(width, height);
-
                         this.bgGrid = [];
                         for(var y = 0; y < height; y++) {
                                 if(!_.isUndefined(rowMap['r_' + y])) {
@@ -56,10 +54,11 @@
 
                                 this.bgGrid.push([]);
                                 for(var x = 0; x < width; x++) {
-                                        if(gridMap[y][x]) {
+                                        tileColor = fgTileColor;
+                                        if(!(x % 2) && (y % 2)) {
                                                 tileColor = bgTileColor;
-                                        } else {
-                                                tileColor = fgTileColor;
+                                        } else if((x % 2) && !(y % 2)) {
+                                                tileColor = bgTileColor;
                                         }
 
                                         this.bgGrid[this.bgGrid.length - 1].push(tileColor);
@@ -88,7 +87,7 @@
                                 height += height * App.Draw.get('background').parallax.y;
                         }
 
-                        //this.createBackgroundGrid(width, height, settings.rows);
+                        this.createBackgroundGrid(width, height, settings.rows);
 
                         // respawn the player and sky
                         this.spawn('player', this.playerSpawn.x, this.playerSpawn.y);
@@ -99,7 +98,7 @@
 
                         // generate the map
                         if(!settings.blockers.length) {
-                                this.grid = this.generateBlockers(settings.width, settings.height);     
+                                this.grid = this.generateBlockers(settings.width, settings.height, settings.mapSize);     
                         } else {
                                 this.grid = settings.blockers;
                         }
@@ -117,7 +116,7 @@
 
                 this.generateBlockers = function(width, height, mapSize) {
                         // generate an empty map grid
-                        var grid = [], val, x = 0, y = 0, dir;
+                        var grid = [], val, x = 0, y = 0, dir, lastDir = -1;
                         for(y = 0; y < height; y++) {
                                 grid.push([]);
                                 for(x = 0; x < width; x++) {
@@ -133,6 +132,14 @@
                                 
                                 while(1) {
                                         dir = App.Tools.rand(0, 3);
+
+                                        if(dir > 3) {
+                                                if(lastDir < 0) {
+                                                        continue;
+                                                }
+                                                dir = lastDir;
+                                        }
+
                                         if(dir == 0 && x <= 1) {
                                                 continue;
                                         }
@@ -162,6 +169,8 @@
                                                 y -= 1;
                                                 break;
                                 }
+
+                                lastDir = dir;
                         }
 
                         // some post-processing (fill in two two surrounding rows)
@@ -362,10 +371,10 @@
                                 for(x = 0; x < this.bgGrid[y].length; x++) {
                                         App.Draw.get('background').fillRect(
                                                 x * this.tileSize, 
-                                                y * this.tileSize, 
+                                                y * this.tileSize + 32, 
                                                 this.tileSize, 
                                                 this.tileSize, 
-                                                '#F2B6B6'
+                                                this.bgGrid[y][x]
                                         );
                                 }
                         }
@@ -390,13 +399,22 @@
                                                         '#D60000'
                                                 );
 
+                                                // if there's a tile directly below we can skip drawing
+                                                if(y < this.grid[y].length - 1 && this.grid[y + 1][x]) {
+                                                        continue;
+                                                }
+
                                                 App.Draw.get('background').fillRect(
                                                         x * this.tileSize,
                                                         (y * this.tileSize - 32) + this.tileSize,
                                                         this.tileSize, 
                                                         64, 
-                                                        '#660000'
+                                                        y >= this.grid[y].length - 1 ? '#D60000' : '#660000'
                                                 );
+
+                                                if(y >= this.grid[y].length - 1) {
+                                                        continue;
+                                                }
                                                 
                                                 // Shadow
                                                 App.Draw.get('background').fillRect(
@@ -521,7 +539,7 @@
                         var i = 0;
                         
                         for(i = 0; i < this.entities.length; i++) {
-                                this.entities[i].shutdown();
+                                //this.entities[i].shutdown();
                                 delete this.entities[i];
                         }
 

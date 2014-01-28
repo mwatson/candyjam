@@ -19,6 +19,11 @@
                                 Movable: {
                                 }, 
                                 Collidable: {
+                                        method: 'cross', 
+                                        setup: {
+                                                x: { x: 0, y: 10, width: 64, height: 44 }, 
+                                                y: { x: 10, y: 0, width: 44, height: 64 }
+                                        }
                                 }, 
                                 IsPlayer: {
                                 }, 

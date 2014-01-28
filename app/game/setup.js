@@ -138,7 +138,7 @@ App.init = function() {
                         }
                 }, 
 
-                // the maps (first one is the title screen)
+                // the maps
                 world: [{
 
                         tileSize: 96, 
@@ -154,7 +154,59 @@ App.init = function() {
 
                         // define the colors of the bg tiles
                         rows: [
-                                { depth: 0,  fgColor: '#b39e83', bgColor: '#b39e83' }, 
+                                { depth: 0,  fgColor: '#F2B6B6', bgColor: '#EDCCCC' }, 
+                        ], 
+
+                        blockers: [], 
+
+                        bounds: {}, 
+
+                        loaded: function() {
+                                App.Draw.forceOrigin(0, 0);
+                        }
+                },
+                {
+
+                        tileSize: 96, 
+                        width: 32, 
+                        height: 32, 
+
+                        mapSize: 1500, 
+                        
+                        playerStart: {
+                                x: 16 * 96, 
+                                y: 16 * 96
+                        }, 
+
+                        // define the colors of the bg tiles
+                        rows: [
+                                { depth: 0,  fgColor: '#F2B6B6', bgColor: '#EDCCCC' }, 
+                        ], 
+
+                        blockers: [], 
+
+                        bounds: {}, 
+
+                        loaded: function() {
+                                App.Draw.forceOrigin(0, 0);
+                        }
+                }, 
+                {
+
+                        tileSize: 96, 
+                        width: 32, 
+                        height: 32, 
+
+                        mapSize: 2000, 
+                        
+                        playerStart: {
+                                x: 16 * 96, 
+                                y: 16 * 96
+                        }, 
+
+                        // define the colors of the bg tiles
+                        rows: [
+                                { depth: 0,  fgColor: '#F2B6B6', bgColor: '#EDCCCC' }, 
                         ], 
 
                         blockers: [], 
