@@ -178,6 +178,12 @@
 
                         App.World.map.draw(interpolation, moveDelta);
 
+                        App.Draw.get('hud').drawImg(
+                                'crosshair01', 
+                                App.Controls.mouseCursor().x, 
+                                App.Controls.mouseCursor().y
+                        );
+
                         if(App.Game.settings.debug.fps) {
                                 App.Tools.printFPS('hud', App.Game.loopInfo);
                                 App.Tools.printPlayerPos('hud', App.World.getPlayer());
@@ -264,6 +270,10 @@
                                 if(App.World.map.entities[i].is('IsEnemy')) {
                                         App.World.map.entities[i].c('IsEnemy').behavior();
                                 }
+
+                                if(App.World.map.entities[i].is('Projectile')) {
+                                        App.World.map.entities[i].c('Projectile').behavior();
+                                }
                         }
                 };
 
@@ -272,7 +282,8 @@
                             xDir = 0, 
                             yDir = 0, 
                             newPos = {}, 
-                            collisions = [];
+                            collisions = [], 
+                            cursor;
 
                         if(App.Controls.keyDown('A') || App.Controls.keyDown('ARROW_LEFT')) {
                                 xDir -= 1;
@@ -287,6 +298,13 @@
                                 yDir += 1;
                         }
                         if(App.Controls.keyPress('SPACE') || App.Controls.keyPress('ENTER')) {
+                        }
+
+                        if(App.Controls.mouseClick('BUTTON_LEFT')) {
+                                cursor = App.Controls.mouseCursor();
+                                player.c('HasProjectile').fire(cursor.x, cursor.y);
+                        }
+                        if(App.Controls.mouseClick('BUTTON_RIGHT')) {
                         }
 
                         newPos = player.c('Movable').move(xDir, yDir);

@@ -366,9 +366,74 @@ Entity Components:
         root.App.Objects.Components.IsPlayer = isPlayer;
 
         var projectile = function(entity, settings) {
+
+                this.en = entity;
+
+                this.init = function(x, y){
+
+                        // convert game area position to map position
+                        // (offset by -32 because of the cursor/crosshair)
+                        x -= App.Draw.canvas.entity.origin.x - 32;
+                        y -= App.Draw.canvas.entity.origin.y - 32;
+
+                        var projX = Math.abs(this.en.attrs.x - x), 
+                            projY = Math.abs(this.en.attrs.y - y);
+                            
+                        if(projX > projY) {
+                                projY = projY / projX;
+                                projX = 1;
+                        } else {
+                                projX = projX / projY;
+                                projY = 1;
+                        }
+                        
+                        if(this.en.attrs.x > x) {
+                                projX *= -1;
+                        }
+                        
+                        if(this.en.attrs.y > y) {
+                                projY *= -1;
+                        }
+
+                        this.en.attrs.dir.x = projX;
+                        this.en.attrs.dir.y = projY;
+                };
+
+                // default projectile behavior is to just move in one direction forever
+                this.behavior = function() {
+                        var newPos;
+                        if(this.en.is('Movable')) {
+                                newPos = this.en.c('Movable').move(this.en.attrs.dir.x, this.en.attrs.dir.y);
+                                if(this.en.is('Collidable')) {
+                                        this.en.c('Collidable').checkMapCollision(newPos.x, newPos.y);
+                                }
+                        }
+                };
+
+                if(settings.behavior) {
+                        this.behavior = settings.behavior;
+                }
         };
 
         root.App.Objects.Components.Projectile = projectile;
+
+        var hasProjectile = function(entity, settings) {
+
+                var en = entity;
+
+                this.fire = function(x, y) { // x and y are the point the projectile should be aimed towards
+
+                        var pId = App.World.map.spawn(
+                                settings.name, 
+                                en.attrs.x + settings.origin.x, 
+                                en.attrs.y + settings.origin.y
+                        );
+
+                        App.World.map.entities[pId].c('Projectile').init(x, y);
+                };
+        };
+
+        root.App.Objects.Components.HasProjectile = hasProjectile;
 
         var isEnemy = function(entity, settings) {
 

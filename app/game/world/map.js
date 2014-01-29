@@ -497,7 +497,7 @@
                         props.x    = x;
                         props.y    = y;
                         props.type = name;
-                        props.id   = this.entities.length + 1;
+                        props.id   = this.entities.length;
 
                         entity = new App.Objects.Entity(props);
 

@@ -57,6 +57,15 @@
                         return this.canvas.background.origin;
                 };
 
+                this.getCanvasOffset = function(canvas) {
+                        return {
+                                x: this.canvas[canvas].el.offsetLeft, 
+                                y: this.canvas[canvas].el.offsetTop, 
+                                width: this.canvas[canvas].el.width, 
+                                height: this.canvas[canvas].el.height
+                        };
+                };
+
                 this.setResolution = function() {
                         var winW = window.innerWidth, 
                             winH = window.innerHeight;

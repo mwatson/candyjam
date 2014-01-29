@@ -28,6 +28,10 @@
                                 IsPlayer: {
                                 }, 
                                 Hurtable: {
+                                },
+                                HasProjectile: {
+                                        name: 'bullet',
+                                        origin: { x: 24, y: 24 }
                                 }
                         }
                 }, 
@@ -35,10 +39,10 @@
                 bullet: {
                         width: 16, 
                         height: 16, 
-                        speed: 16, 
+                        speed: 14, 
                         components: {
                                 Renderable: {
-                                        color: '#C0C0C0'
+                                        color: '#666666 '
                                 }, 
                                 Movable: {
                                 }, 

@@ -23,6 +23,8 @@
                         { name: 'grunt_shades01', rel: 'img/gruntdrop/shades.png' },
 
                         { name: 'shadow_64', rel: 'img/shadow01.png' }, 
+
+                        { name: 'crosshair01', rel: 'img/crosshair01.png' }
                 ], 
 
                 CompositeImages: [
