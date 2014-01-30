@@ -167,9 +167,13 @@
                         if(this.gameState == 'gameplay') {
                                 // attempt to keep the player centered
                                 var player = App.World.getPlayer(0), 
+                                    camera = App.World.map.camera, 
                                     playerCenter = player.center(), 
-                                    originX = -((playerCenter.x + player.attrs.dir.x * player.attrs.speed * interpolation * moveDelta) - (App.Draw.width() / 2)), 
-                                    originY = -((playerCenter.y + player.attrs.dir.y * player.attrs.speed * interpolation * moveDelta) - (App.Draw.height() / 2));
+                                    cameraCenter = camera.center(), 
+                                    //originX = -((playerCenter.x + player.attrs.dir.x * player.attrs.speed * interpolation * moveDelta) - (App.Draw.width() / 2)), 
+                                    //originY = -((playerCenter.y + player.attrs.dir.y * player.attrs.speed * interpolation * moveDelta) - (App.Draw.height() / 2));
+                                    originX = -((cameraCenter.x + camera.attrs.dir.x * camera.attrs.speed * interpolation * moveDelta) - (App.Draw.width() / 2)), 
+                                    originY = -((cameraCenter.y + camera.attrs.dir.y * camera.attrs.speed * interpolation * moveDelta) - (App.Draw.height() / 2));
 
                                 App.Draw.setOrigin(originX, originY);
                         }
@@ -273,6 +277,10 @@
 
                                 if(App.World.map.entities[i].is('Projectile')) {
                                         App.World.map.entities[i].c('Projectile').behavior();
+                                }
+
+                                if(App.World.map.entities[i].is('IsCamera')) {
+                                        App.World.map.entities[i].c('IsCamera').behavior();
                                 }
                         }
                 };

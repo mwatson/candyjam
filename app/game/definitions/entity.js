@@ -36,6 +36,43 @@
                         }
                 }, 
 
+                camera: {
+                        width: 64, 
+                        height: 64, 
+                        speed: 8, 
+                        components: {
+                                //Renderable: {
+                                        //color: 'rgba(255,0,255,0.25)'
+                                //},
+                                Movable: {
+                                },
+                                IsCamera: {
+                                        behavior: function() {
+                                                var player = App.World.getPlayer(0), 
+                                                    pCenter = player.center(), 
+                                                    cCenter = this.en.center(), 
+                                                    xDir = 0,  
+                                                    yDir = 0, 
+                                                    newPos;
+
+                                                if(cCenter.x > pCenter.x && cCenter.x - pCenter.x > this.en.attrs.width / 2) {
+                                                        xDir = -1;
+                                                } else if(cCenter.x < pCenter.x && pCenter.x - cCenter.x > this.en.attrs.width / 2) {
+                                                        xDir = 1;
+                                                }
+
+                                                if(cCenter.y > pCenter.y && cCenter.y - pCenter.y > this.en.attrs.height / 2) {
+                                                        yDir = -1;
+                                                } else if(cCenter.y < pCenter.y && pCenter.y - cCenter.y > this.en.attrs.height / 2) {
+                                                        yDir = 1;
+                                                }
+
+                                                this.en.c('Movable').move(xDir, yDir);
+                                        }
+                                }
+                        }
+                }, 
+
                 bullet: {
                         width: 16, 
                         height: 16, 
@@ -86,8 +123,7 @@
                                                         yDir = 1;
                                                 }
 
-                                                newPos = this.en.c('Movable').move(xDir, yDir);
-                                                this.en.c('Collidable').checkMapCollision(newPos.x, newPos.y);
+                                                this.en.c('Movable').move(xDir, yDir);
                                         }
                                 }, 
                                 Hurtable: {

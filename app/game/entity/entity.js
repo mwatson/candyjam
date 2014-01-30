@@ -343,7 +343,7 @@ Entity Components:
                         if(en.is('Collidable')) {
                                 newPos = en.c('Collidable').checkMapCollision(xStep, yStep);
                         } else {
-                                newPos = { x: xPos, y: yPos };
+                                newPos = { x: xStep, y: yStep };
                         }
                         
                         en.setPosition(newPos.x, newPos.y);
@@ -354,7 +354,7 @@ Entity Components:
                                 en.changeState('idle');
                         }
 
-                        return { x: xStep, y: yStep };
+                        return newPos
                 };
         };
 
@@ -369,7 +369,7 @@ Entity Components:
 
                 this.en = entity;
 
-                this.init = function(x, y){
+                this.init = function(x, y, parent){
 
                         // convert game area position to map position
                         // (offset by -32 because of the cursor/crosshair)
@@ -403,10 +403,7 @@ Entity Components:
                 this.behavior = function() {
                         var newPos;
                         if(this.en.is('Movable')) {
-                                newPos = this.en.c('Movable').move(this.en.attrs.dir.x, this.en.attrs.dir.y);
-                                if(this.en.is('Collidable')) {
-                                        this.en.c('Collidable').checkMapCollision(newPos.x, newPos.y);
-                                }
+                                this.en.c('Movable').move(this.en.attrs.dir.x, this.en.attrs.dir.y);
                         }
                 };
 
@@ -429,7 +426,7 @@ Entity Components:
                                 en.attrs.y + settings.origin.y
                         );
 
-                        App.World.map.entities[pId].c('Projectile').init(x, y);
+                        App.World.map.entities[pId].c('Projectile').init(x, y, en);
                 };
         };
 
@@ -449,5 +446,20 @@ Entity Components:
         };
 
         root.App.Objects.Components.IsEnemy = isEnemy;
+
+        var isCamera = function(entity, settings) {
+
+                this.en = entity;
+
+                this.behavior = function() {
+                        return 1;
+                };
+
+                if(settings.behavior) {
+                        this.behavior = settings.behavior;
+                }
+        };
+
+        root.App.Objects.Components.IsCamera = isCamera;
 
 })(this);

@@ -74,16 +74,16 @@
                         var canvasOffset = App.Draw.getCanvasOffset('entity'), 
                             xVal, yVal;
 
-                        if(x < canvasOffset.x) {
-                                xVal = 0;
+                        if(x < canvasOffset.x - 64) {
+                                xVal = -64;
                         } else if(x > canvasOffset.x + canvasOffset.width) {
                                 xVal = canvasOffset.width;
                         } else {
                                 xVal = x - canvasOffset.x;
                         }
 
-                        if(y < canvasOffset.y) {
-                                yVal = 0;
+                        if(y < canvasOffset.y - 64) {
+                                yVal = -64;
                         } else if(y > canvasOffset.y + canvasOffset.height) {
                                 yVal = canvasOffset.height;
                         } else {

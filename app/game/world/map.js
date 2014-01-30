@@ -32,6 +32,8 @@
 
                 this.playerSpawn = { x: 0, y: 0 };
 
+                this.camera = null;
+
                 this.createBackgroundGrid = function(width, height, rows) {
                         var rowMap = {}, 
                             tileColor, 
@@ -621,12 +623,16 @@
                         self.processGrid();
 
                         // spawn the player
-                        self.spawn(
+                        var playerId = self.spawn(
                                 'player', 
                                 self.playerSpawn.x + Math.floor(App.Defaults.Entity.player.width / 4), 
                                 self.playerSpawn.y + Math.floor(App.Defaults.Entity.player.height / 4)
                         );
-                        App.Player.playerEnt = self.entities[0];
+                        App.Player.playerEnt = self.entities[playerId];
+
+                        // spawn the camera
+                        var cameraId = self.spawn('camera', App.Player.playerEnt.attrs.x - 320, App.Player.playerEnt.attrs.y - 240);
+                        self.camera = self.entities[cameraId];
 
                         if(!_.isUndefined(settings.loaded)) {
                                 settings.loaded();
