@@ -25,6 +25,10 @@ Entity Components:
                         width: 0, 
                         height: 0, 
                         speed: 0, 
+                        acceleration: {
+                                x: 0, 
+                                y: 0
+                        }, 
                         dir: {
                                 x: 0, 
                                 y: 0
@@ -125,8 +129,8 @@ Entity Components:
                                 canvasId = 'entity';
                         }
 
-                        var xPos = en.attrs.x + en.attrs.dir.x * en.attrs.speed * interpolation * moveDelta, 
-                            yPos = en.attrs.y + en.attrs.dir.y * en.attrs.speed * interpolation * moveDelta;
+                        var xPos = en.attrs.x + en.attrs.dir.x * en.attrs.acceleration.x * interpolation * moveDelta, 
+                            yPos = en.attrs.y + en.attrs.dir.y * en.attrs.acceleration.y * interpolation * moveDelta;
 
                         // draw their shadow
                         if(this.attrs.shadow) {
@@ -194,6 +198,87 @@ Entity Components:
         };
 
         root.App.Objects.Components.Renderable = renderable;
+
+        var movable = function(entity, settings) {
+
+                var en = entity, 
+                    attrs = {
+                        acceleration: (_.isUndefined(settings.acceleration) ? en.attrs.speed : settings.acceleration), 
+                        lastDir: { x: 0, y: 0 }
+                    };
+
+                this.move = function(xDir, yDir) {
+
+                        var xStep = en.attrs.x, 
+                            yStep = en.attrs.y, 
+                            newPos, 
+                            speed = en.attrs.speed;
+
+                        if(xDir != 0 && yDir != 0) {
+                                //speed = Math.ceil(Math.sqrt((en.attrs.speed * en.attrs.speed) / 2));
+                        }
+
+                        // set the directions on the entity
+                        en.attrs.dir.x = xDir;
+                        en.attrs.dir.y = yDir;
+
+                        xStep += ~~(xDir * (en.attrs.acceleration.x * App.Game.moveDelta));
+                        yStep += ~~(yDir * (en.attrs.acceleration.y * App.Game.moveDelta));
+
+                        if(en.is('Collidable')) {
+                                newPos = en.c('Collidable').checkMapCollision(xStep, yStep);
+                        } else {
+                                newPos = { x: xStep, y: yStep };
+                        }
+
+                        if(Math.abs(en.attrs.dir.x - attrs.lastDir.x) > 1) {
+                                en.attrs.acceleration.x = 0;
+                        } else {
+                                if(!en.attrs.dir.x && en.attrs.acceleration.x > 0) {
+                                        en.attrs.acceleration.x -= attrs.acceleration;
+                                        if(en.attrs.acceleration.x < 0) {
+                                                en.attrs.acceleration.x = 0;
+                                        }
+                                } else {
+                                        en.attrs.acceleration.x += attrs.acceleration;
+                                        if(en.attrs.acceleration.x > en.attrs.speed) {
+                                                en.attrs.acceleration.x = en.attrs.speed;
+                                        }
+                                }
+                        }
+
+                        if(Math.abs(en.attrs.dir.y - attrs.lastDir.y) > 1) {
+                                en.attrs.acceleration.y = 0;
+                        } else {
+                                if(!en.attrs.dir.y && en.attrs.acceleration.y > 0) {
+                                        en.attrs.acceleration.y -= attrs.acceleration;
+                                        if(en.attrs.acceleration.y < 0) {
+                                                en.attrs.acceleration.y = 0;
+                                        }
+                                } else {
+                                        en.attrs.acceleration.y += attrs.acceleration;
+                                        if(en.attrs.acceleration.y > en.attrs.speed) {
+                                                en.attrs.acceleration.y = en.attrs.speed;
+                                        }
+                                }
+                        }
+
+                        attrs.lastDir.x = en.attrs.dir.x;
+                        attrs.lastDir.y = en.attrs.dir.y;
+                        
+                        en.setPosition(newPos.x, newPos.y);
+
+                        if(xDir !== 0) {
+                                en.changeState('walk');
+                        } else {
+                                en.changeState('idle');
+                        }
+
+                        return newPos
+                };
+        };
+
+        root.App.Objects.Components.Movable = movable;
 
         // collides with the map and other entities
         var collidable = function(entity, settings) {
@@ -322,43 +407,6 @@ Entity Components:
         };
 
         root.App.Objects.Components.Collidable = collidable;
-
-        var movable = function(entity, settings) {
-
-                var en = entity;
-
-                this.move = function(xDir, yDir) {
-
-                        var xStep = en.attrs.x, 
-                            yStep = en.attrs.y, 
-                            newPos;
-
-                        // set the directions on the entity
-                        en.attrs.dir.x = xDir;
-                        en.attrs.dir.y = yDir;
-
-                        xStep += ~~(xDir * (en.attrs.speed * App.Game.moveDelta));
-                        yStep += ~~(yDir * (en.attrs.speed * App.Game.moveDelta));
-
-                        if(en.is('Collidable')) {
-                                newPos = en.c('Collidable').checkMapCollision(xStep, yStep);
-                        } else {
-                                newPos = { x: xStep, y: yStep };
-                        }
-                        
-                        en.setPosition(newPos.x, newPos.y);
-
-                        if(xDir !== 0) {
-                                en.changeState('walk');
-                        } else {
-                                en.changeState('idle');
-                        }
-
-                        return newPos
-                };
-        };
-
-        root.App.Objects.Components.Movable = movable;
 
         var isPlayer = function(entity, settings) {
         };
