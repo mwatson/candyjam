@@ -25,7 +25,8 @@ Entity Components:
                         width: 0, 
                         height: 0, 
                         speed: 0, 
-                        acceleration: {
+
+                        velocity: {
                                 x: 0, 
                                 y: 0
                         }, 
@@ -129,8 +130,8 @@ Entity Components:
                                 canvasId = 'entity';
                         }
 
-                        var xPos = en.attrs.x + en.attrs.dir.x * en.attrs.acceleration.x * interpolation * moveDelta, 
-                            yPos = en.attrs.y + en.attrs.dir.y * en.attrs.acceleration.y * interpolation * moveDelta;
+                        var xPos = en.attrs.x + en.attrs.velocity.x * interpolation * moveDelta, 
+                            yPos = en.attrs.y + en.attrs.velocity.y * interpolation * moveDelta;
 
                         // draw their shadow
                         if(this.attrs.shadow) {
@@ -204,7 +205,8 @@ Entity Components:
                 var en = entity, 
                     attrs = {
                         acceleration: (_.isUndefined(settings.acceleration) ? en.attrs.speed : settings.acceleration), 
-                        lastDir: { x: 0, y: 0 }
+                        lastDir: { x: 0, y: 0 }, 
+                        accel: { x: 0, y: 0 }
                     };
 
                 this.move = function(xDir, yDir) {
@@ -222,51 +224,22 @@ Entity Components:
                         en.attrs.dir.x = xDir;
                         en.attrs.dir.y = yDir;
 
-                        xStep += ~~(xDir * (en.attrs.acceleration.x * App.Game.moveDelta));
-                        yStep += ~~(yDir * (en.attrs.acceleration.y * App.Game.moveDelta));
+                        en.attrs.velocity.x += ((xDir * en.attrs.speed) - en.attrs.velocity.x) * attrs.acceleration;
+                        en.attrs.velocity.y += ((yDir * en.attrs.speed) - en.attrs.velocity.y) * attrs.acceleration;
+
+                        xStep += ~~((en.attrs.velocity.x * App.Game.moveDelta));
+                        yStep += ~~((en.attrs.velocity.y * App.Game.moveDelta));
 
                         if(en.is('Collidable')) {
                                 newPos = en.c('Collidable').checkMapCollision(xStep, yStep);
                         } else {
                                 newPos = { x: xStep, y: yStep };
                         }
-
-                        if(Math.abs(en.attrs.dir.x - attrs.lastDir.x) > 1) {
-                                en.attrs.acceleration.x = 0;
-                        } else {
-                                if(!en.attrs.dir.x && en.attrs.acceleration.x > 0) {
-                                        en.attrs.acceleration.x -= attrs.acceleration;
-                                        if(en.attrs.acceleration.x < 0) {
-                                                en.attrs.acceleration.x = 0;
-                                        }
-                                } else {
-                                        en.attrs.acceleration.x += attrs.acceleration;
-                                        if(en.attrs.acceleration.x > en.attrs.speed) {
-                                                en.attrs.acceleration.x = en.attrs.speed;
-                                        }
-                                }
-                        }
-
-                        if(Math.abs(en.attrs.dir.y - attrs.lastDir.y) > 1) {
-                                en.attrs.acceleration.y = 0;
-                        } else {
-                                if(!en.attrs.dir.y && en.attrs.acceleration.y > 0) {
-                                        en.attrs.acceleration.y -= attrs.acceleration;
-                                        if(en.attrs.acceleration.y < 0) {
-                                                en.attrs.acceleration.y = 0;
-                                        }
-                                } else {
-                                        en.attrs.acceleration.y += attrs.acceleration;
-                                        if(en.attrs.acceleration.y > en.attrs.speed) {
-                                                en.attrs.acceleration.y = en.attrs.speed;
-                                        }
-                                }
-                        }
+                        
+                        en.setPosition(newPos.x, newPos.y);
 
                         attrs.lastDir.x = en.attrs.dir.x;
                         attrs.lastDir.y = en.attrs.dir.y;
-                        
-                        en.setPosition(newPos.x, newPos.y);
 
                         if(xDir !== 0) {
                                 en.changeState('walk');
@@ -366,8 +339,8 @@ Entity Components:
                                                         xStep = s1 * App.World.map.tileSize - this.bBox.w('x') - 1;
                                                 } else if(xDir == -1) {
                                                         xStep = s1 * App.World.map.tileSize + App.World.map.tileSize;
-                                                };
-                                                en.attrs.dir.x = 0;
+                                                }
+                                                en.attrs.velocity.x = 0;
                                                 collisions.push({ type: 'map', x: s1, y: yRows[i] });
                                         }
                                 }
@@ -396,7 +369,7 @@ Entity Components:
                                                 } else if(yDir == -1) {
                                                         yStep = s1 * App.World.map.tileSize + App.World.map.tileSize;
                                                 }
-                                                en.attrs.dir.y = 0;
+                                                en.attrs.velocity.y = 0;
                                                 collisions.push({ type: 'map', x: xCols[i], y: s1 });
                                         }
                                 }

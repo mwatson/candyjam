@@ -9,7 +9,7 @@
                 player: {
                         width: 64, 
                         height: 64, 
-                        speed: 7, 
+                        speed: 8, 
                         components: {
                                 Renderable: {
                                         color: '#FF2828', 
@@ -17,7 +17,7 @@
                                         shadow: 'shadow_64'
                                 }, 
                                 Movable: {
-                                        acceleration: 2
+                                        acceleration: 0.2
                                 }, 
                                 Collidable: {
                                         method: 'cross', 
@@ -40,15 +40,10 @@
                 camera: {
                         width: 96, 
                         height: 64, 
-                        speed: 7, 
+                        speed: 8, 
                         components: {
-                                /*
-                                Renderable: {
-                                        color: 'rgba(255,0,255,0.25)'
-                                },
-                                */
                                 Movable: {
-                                        acceleration: 2
+                                        acceleration: 0.4
                                 },
                                 IsCamera: {
                                         behavior: function() {

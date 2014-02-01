@@ -172,8 +172,8 @@
                                     cameraCenter = camera.center(), 
                                     //originX = -((playerCenter.x + player.attrs.dir.x * player.attrs.speed * interpolation * moveDelta) - (App.Draw.width() / 2)), 
                                     //originY = -((playerCenter.y + player.attrs.dir.y * player.attrs.speed * interpolation * moveDelta) - (App.Draw.height() / 2));
-                                    originX = -((cameraCenter.x + camera.attrs.dir.x * camera.attrs.acceleration.x * interpolation * moveDelta) - (App.Draw.width() / 2)), 
-                                    originY = -((cameraCenter.y + camera.attrs.dir.y * camera.attrs.acceleration.y * interpolation * moveDelta) - (App.Draw.height() / 2));
+                                    originX = -((cameraCenter.x + camera.attrs.velocity.x * interpolation * moveDelta) - (App.Draw.width() / 2)), 
+                                    originY = -((cameraCenter.y + camera.attrs.velocity.y * interpolation * moveDelta) - (App.Draw.height() / 2));
 
                                 App.Draw.setOrigin(originX, originY);
                         }
