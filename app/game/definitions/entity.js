@@ -32,6 +32,7 @@
                                 },
                                 HasProjectile: {
                                         name: 'bullet',
+                                        rate: 50, 
                                         origin: { x: 24, y: 24 }
                                 }
                         }

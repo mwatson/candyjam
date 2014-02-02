@@ -382,6 +382,9 @@
                         }
 
                         for(i = 0; i < this.entities.length; i++) {
+                                if(this.entities[i].removed) {
+                                        continue;
+                                }
                                 if(!this.entities[i].is('IsPlayer') && this.entities[i].is('Renderable')) {
                                         this.entities[i].c('Renderable').draw(interpolation, null, moveDelta);
                                 }

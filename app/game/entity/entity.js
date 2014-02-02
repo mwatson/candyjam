@@ -21,6 +21,8 @@
 
                 this.state = 'idle';
 
+                this.removed = false;
+
                 this.center = function() {
                         return {
                                 x: this.attrs.x + this.attrs.width / 2, 
@@ -74,6 +76,14 @@
                         }
                 };
 
+                // flag for removal
+                this.removeEntity = function(callback) {
+                        this.removed = true;
+                        if(_.isFunction(callback)) {
+                                callback();
+                        }
+                };
+
                 this.init = (function(settings, self){
 
                         self.attrs.width = settings.width;
@@ -117,6 +127,10 @@
                             xDir = en.attrs.x - lastPos.x, 
                             xPos = en.attrs.x + en.attrs.velocity.x * interpolation * moveDelta, 
                             yPos = en.attrs.y + en.attrs.velocity.y * interpolation * moveDelta;
+
+                        if(en.is('IsPlayer')) {
+                                //console.log(yPos, en.attrs.velocity.y, interpolation, moveDelta);
+                        }
 
                         // draw their shadow
                         if(this.attrs.shadow) {
@@ -189,10 +203,8 @@
 
                 var en = entity, 
                     attrs = {
-                        acceleration: (_.isUndefined(settings.acceleration) ? en.attrs.speed : settings.acceleration), 
-                        lastDir: { x: 0, y: 0 }, 
-                        lastPos: { x: 0, y: 0 }, 
-                        accel: { x: 0, y: 0 }
+                        acceleration: (_.isUndefined(settings.acceleration) ? 1 : settings.acceleration), 
+                        lastPos: { x: 0, y: 0 }
                     };
 
                 this.getLastPos = function() {
@@ -222,8 +234,6 @@
                                 newPos = { x: xStep, y: yStep };
                         }
 
-                        attrs.lastDir.x = en.attrs.dir.x;
-                        attrs.lastDir.y = en.attrs.dir.y;
                         attrs.lastPos.x = en.attrs.x;
                         attrs.lastPos.y = en.attrs.y;
 
@@ -412,8 +422,18 @@
                 // default projectile behavior is to just move in one direction forever
                 this.behavior = function() {
                         var newPos;
-                        if(this.en.is('Movable')) {
-                                this.en.c('Movable').move(this.en.attrs.dir.x, this.en.attrs.dir.y);
+                        if(!this.en.is('Movable')) {
+                                return;
+                        }
+                        
+                        newPos = this.en.c('Movable').move(this.en.attrs.dir.x, this.en.attrs.dir.y);
+
+                        if(!this.en.is('Collidable')) {
+                                return;
+                        }
+
+                        if(newPos.collisions.length) {
+                                this.en.removeEntity();
                         }
                 };
 
@@ -426,9 +446,15 @@
 
         var hasProjectile = function(entity, settings) {
 
-                var en = entity;
+                var en = entity, 
+                    rate = settings.rate, 
+                    rateTimer = 0;
 
                 this.fire = function(x, y) { // x and y are the point the projectile should be aimed towards
+
+                        if(!this.timer()) {
+                                return;
+                        }
 
                         var pId = App.World.map.spawn(
                                 settings.name, 
@@ -437,6 +463,17 @@
                         );
 
                         App.World.map.entities[pId].c('Projectile').init(x, y, en);
+
+                        return;
+                };
+
+                this.timer = function() {
+                        rateTimer -= App.Game.gameTicks() - App.Game.lastUpdate;
+                        if(rateTimer <= 0) {
+                                rateTimer = rate;
+                                return true;
+                        }
+                        return false;
                 };
         };
 

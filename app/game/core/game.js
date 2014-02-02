@@ -123,10 +123,6 @@
                         }
 
                         this.interpolation = accumulator / this.skipTicks;
-                        if(!this.interpolation) {
-                                this.interpolation = 0.0000000000000001;
-                        }
-                        this.interpolation = 0;
 
                         if(App.Defs.Assets.Loaded.Complete) {
                                 this.drawOps();
@@ -166,16 +162,12 @@
 
                         if(this.gameState == 'gameplay') {
                                 // attempt to keep the player centered
-                                var player = App.World.getPlayer(0), 
-                                    camera = App.World.map.camera, 
-                                    playerCenter = player.center(), 
+                                var camera = App.World.map.camera, 
                                     cameraCenter = camera.center(), 
-                                    //originX = -((playerCenter.x + player.attrs.dir.x * player.attrs.speed * interpolation * moveDelta) - (App.Draw.width() / 2)), 
-                                    //originY = -((playerCenter.y + player.attrs.dir.y * player.attrs.speed * interpolation * moveDelta) - (App.Draw.height() / 2));
                                     originX = -((cameraCenter.x + camera.attrs.velocity.x * interpolation * moveDelta) - (App.Draw.width() / 2)), 
                                     originY = -((cameraCenter.y + camera.attrs.velocity.y * interpolation * moveDelta) - (App.Draw.height() / 2));
 
-                                App.Draw.setOrigin(originX, originY);
+                                App.Draw.setOrigin(~~originX, ~~originY);
                         }
 
                         App.Draw.drawTransitions(interpolation);
@@ -268,6 +260,10 @@
                         for(var i = 0; i < App.World.map.entities.length; i++) {
 
                                 if(excludePlayer && App.World.map.entities[i].is('IsPlayer')) {
+                                        continue;
+                                }
+
+                                if(App.World.map.entities[i].removed) {
                                         continue;
                                 }
                                 
