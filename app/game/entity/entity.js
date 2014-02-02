@@ -1,20 +1,3 @@
-/*
-
-Better entity system!
-
-Entity Components:
-- Renderable
-- Collectable
-- Enemy
-- Fish
-- Blocker
-- Collidable
-- Hurtable
-- Player
-
-*/
-
-
 (function(root) {
 
         var entity = function(settings) {
@@ -130,7 +113,9 @@ Entity Components:
                                 canvasId = 'entity';
                         }
 
-                        var xPos = en.attrs.x + en.attrs.velocity.x * interpolation * moveDelta, 
+                        var lastPos = en.c('Movable').getLastPos(), 
+                            xDir = en.attrs.x - lastPos.x, 
+                            xPos = en.attrs.x + en.attrs.velocity.x * interpolation * moveDelta, 
                             yPos = en.attrs.y + en.attrs.velocity.y * interpolation * moveDelta;
 
                         // draw their shadow
@@ -206,8 +191,13 @@ Entity Components:
                     attrs = {
                         acceleration: (_.isUndefined(settings.acceleration) ? en.attrs.speed : settings.acceleration), 
                         lastDir: { x: 0, y: 0 }, 
+                        lastPos: { x: 0, y: 0 }, 
                         accel: { x: 0, y: 0 }
                     };
+
+                this.getLastPos = function() {
+                        return attrs.lastPos;
+                };
 
                 this.move = function(xDir, yDir) {
 
@@ -215,10 +205,6 @@ Entity Components:
                             yStep = en.attrs.y, 
                             newPos, 
                             speed = en.attrs.speed;
-
-                        if(xDir != 0 && yDir != 0) {
-                                //speed = Math.ceil(Math.sqrt((en.attrs.speed * en.attrs.speed) / 2));
-                        }
 
                         // set the directions on the entity
                         en.attrs.dir.x = xDir;
@@ -235,11 +221,13 @@ Entity Components:
                         } else {
                                 newPos = { x: xStep, y: yStep };
                         }
-                        
-                        en.setPosition(newPos.x, newPos.y);
 
                         attrs.lastDir.x = en.attrs.dir.x;
                         attrs.lastDir.y = en.attrs.dir.y;
+                        attrs.lastPos.x = en.attrs.x;
+                        attrs.lastPos.y = en.attrs.y;
+
+                        en.setPosition(newPos.x, newPos.y);
 
                         if(xDir !== 0) {
                                 en.changeState('walk');
@@ -247,7 +235,7 @@ Entity Components:
                                 en.changeState('idle');
                         }
 
-                        return newPos
+                        return newPos;
                 };
         };
 
@@ -311,8 +299,9 @@ Entity Components:
 
                         var xMin = 0, 
                             yMin = 0, 
-                            xDir = en.attrs.dir.x, 
-                            yDir = en.attrs.dir.y, 
+                            lastPos = en.c('Movable').getLastPos(), 
+                            xDir = xStep - lastPos.x, 
+                            yDir = yStep - lastPos.y, 
                             xCols = [], 
                             yRows = [], 
                             collisions = [];
@@ -335,9 +324,9 @@ Entity Components:
                                         s1 = Math.floor(xMin / App.World.map.tileSize);
                                         if(_.isUndefined(App.World.map.grid[yRows[i]])) {
                                         } else if(App.World.map.grid[yRows[i]][s1] !== false) {
-                                                if(xDir == 1) {
+                                                if(xDir > 0) {
                                                         xStep = s1 * App.World.map.tileSize - this.bBox.w('x') - 1;
-                                                } else if(xDir == -1) {
+                                                } else if(xDir < 0) {
                                                         xStep = s1 * App.World.map.tileSize + App.World.map.tileSize;
                                                 }
                                                 en.attrs.velocity.x = 0;
@@ -364,9 +353,9 @@ Entity Components:
                                         s1 = Math.floor(yMin / App.World.map.tileSize);
                                         if(_.isUndefined(App.World.map.grid[s1])) {
                                         } else if(App.World.map.grid[s1][xCols[i]] !== false) {
-                                                if(yDir == 1) {
+                                                if(yDir > 0) {
                                                         yStep = s1 * App.World.map.tileSize - this.bBox.h('y') - 1;
-                                                } else if(yDir == -1) {
+                                                } else if(yDir < 0) {
                                                         yStep = s1 * App.World.map.tileSize + App.World.map.tileSize;
                                                 }
                                                 en.attrs.velocity.y = 0;
