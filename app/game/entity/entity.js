@@ -456,8 +456,8 @@
                                 return;
                         }
 
-                        var pId = App.World.map.spawn(
-                                settings.name, 
+                        var pId = App.World.map.fromPool(
+                                'projectile', 
                                 en.attrs.x + settings.origin.x, 
                                 en.attrs.y + settings.origin.y
                         );

@@ -157,6 +157,11 @@ App.init = function() {
                                 { depth: 0,  fgColor: '#F2B6B6', bgColor: '#EDCCCC' }, 
                         ], 
 
+                        colors: {
+                                main: '#D60000',
+                                side: '#660000'
+                        }, 
+
                         blockers: [], 
 
                         bounds: {}, 
@@ -180,8 +185,13 @@ App.init = function() {
 
                         // define the colors of the bg tiles
                         rows: [
-                                { depth: 0,  fgColor: '#F2B6B6', bgColor: '#EDCCCC' }, 
+                                { depth: 0,  fgColor: '#B6ECF2', bgColor: '#CCD8ED' }, 
                         ], 
+
+                        colors: {
+                                main: '#006BD6',
+                                side: '#003066'
+                        }, 
 
                         blockers: [], 
 
@@ -208,6 +218,11 @@ App.init = function() {
                         rows: [
                                 { depth: 0,  fgColor: '#F2B6B6', bgColor: '#EDCCCC' }, 
                         ], 
+
+                        colors: {
+                                main: '#D60000',
+                                side: '#660000'
+                        }, 
 
                         blockers: [], 
 

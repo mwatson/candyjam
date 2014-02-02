@@ -10,6 +10,8 @@
                 this.bgGrid = [];
                 this.grid = [];
 
+                this.levelColors = {};
+
                 // not really a quadtree
                 this.quadtree = [];
                 this.quadWidth = 10;
@@ -401,7 +403,7 @@
                                                         y * this.tileSize - 32,
                                                         this.tileSize, 
                                                         this.tileSize, 
-                                                        '#D60000'
+                                                        this.levelColors.main
                                                 );
 
                                                 // if there's a tile directly below we can skip drawing
@@ -414,7 +416,7 @@
                                                         (y * this.tileSize - 32) + this.tileSize,
                                                         this.tileSize, 
                                                         64, 
-                                                        y >= this.grid[y].length - 1 ? '#D60000' : '#660000'
+                                                        y >= this.grid[y].length - 1 ? this.levelColors.main : this.levelColors.side
                                                 );
 
                                                 if(y >= this.grid[y].length - 1) {
@@ -427,7 +429,6 @@
                                                         (y * this.tileSize - 32) + this.tileSize + 64,
                                                         this.tileSize, 
                                                         24, 
-                                                        //'#b68989'
                                                         'rgba(0,0,0,0.25)'
                                                 );
                                         }
@@ -494,6 +495,10 @@
                         }
                 };
 
+                this.pool = {
+                        projectile: []
+                };
+
                 this.spawn = function(name, x, y) {
 
                         var props = App.Definitions.get('Entity', name), 
@@ -530,6 +535,14 @@
                         return props.id;
                 };
 
+                this.fromPool = function(poolName, x, y) {
+                        var pId = this.pool[poolName].shift();
+                        App.World.map.entities[pId].attrs.x = x;
+                        App.World.map.entities[pId].attrs.x = y;
+                        this.pool[poolName].push(pId);
+                        return pId;
+                };
+
                 this.removeEntities = function() {
                         for(i = 0; i < this.entities.length; i++) {
                                 this.entities[i].shutdown();
@@ -557,6 +570,7 @@
                         self.tileSize = settings.tileSize;
                         self.bounds = settings.bounds;
                         self.playerSpawn = settings.playerStart;
+                        self.levelColors = settings.colors;
 
                         if(_.isUndefined(self.bounds.top)) {
                                 self.bounds.top = 0;
@@ -644,7 +658,14 @@
                         self.width  = settings.width;
                         self.height = settings.height;
 
-                        self.generateDMap('player', [ { x: 2, y: 2 } ]);
+                        // allocate the projectile pool
+                        var pId;
+                        for(var i = 0; i < 50; i++) {
+                                pId = self.spawn('bullet', 0, 0);
+                                self.pool.projectile.push(pId);
+                        }
+
+                        //self.generateDMap('player', [ { x: 2, y: 2 } ]);
 
                 })(settings, this);
         };
