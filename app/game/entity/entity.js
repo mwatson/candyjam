@@ -130,6 +130,7 @@
 
                         if(en.is('IsPlayer')) {
                                 //console.log(yPos, en.attrs.velocity.y, interpolation, moveDelta);
+                                //console.log(en.attrs.velocity.x, en.attrs.velocity.y);
                         }
 
                         // draw their shadow
