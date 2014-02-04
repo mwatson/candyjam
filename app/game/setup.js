@@ -162,6 +162,11 @@ App.init = function() {
                                 side: '#660000'
                         }, 
 
+                        enemies: {
+                                max: 2, 
+                                min: 1
+                        }, 
+
                         blockers: [], 
 
                         bounds: {}, 

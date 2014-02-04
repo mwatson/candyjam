@@ -217,6 +217,51 @@
                         }
                 };
 
+                this.spawnEnemies = function() {
+                        var sideCt, 
+                            enemies = 4;
+                        for(var y = 0; y < this.grid.length; y++) {
+                                for(var x = 0; x < this.grid[y].length; x++) {
+                                        sideCt = 0;
+
+                                        if(!_.isUndefined(this.grid[y][x + 1])) {
+                                                if(!this.grid[y][x + 1]) {
+                                                        sideCt++;
+                                                }
+                                        }
+                                        if(!_.isUndefined(this.grid[y][x - 1])) {
+                                                if(!this.grid[y][x - 1]) {
+                                                        sideCt++;
+                                                }
+                                        }
+                                        if(!_.isUndefined(this.grid[y + 1])) {
+                                                if(!this.grid[y + 1][x]) {
+                                                        sideCt++;
+                                                }
+                                        }
+                                        if(!_.isUndefined(this.grid[y - 1])) {
+                                                if(!this.grid[y - 1][x]) {
+                                                        sideCt++;
+                                                }
+                                        }
+
+                                        if(sideCt == 3 && App.Tools.rand(0, 100) < 25) {
+                                                console.log('spawning grunt at ' + x + ' ' + y);
+                                                this.spawn(
+                                                        'grunt', 
+                                                        x * settings.tileSize, 
+                                                        y * settings.tileSize
+                                                );
+                                                enemies--;
+                                        }
+
+                                        if(enemies <= 0) {
+                                                return;
+                                        }
+                                }
+                        }
+                };
+
                 // generate a path using the specified map
                 this.generatePath = function(map, start) {
                         if(_.isUndefined(this.dMaps[map])) {
@@ -536,10 +581,26 @@
                 };
 
                 this.fromPool = function(poolName, x, y) {
-                        var pId = this.pool[poolName].shift();
+                        var pId;
+                        for(var i = 0; i < this.pool[poolName].length; i++) {
+                                pId = this.pool[poolName].shift();
+                                this.pool[poolName].push(pId);
+                                if(App.World.map.entities[pId].removed) {
+                                        break;
+                                }
+                                pId = false;
+                        }
+
+                        if(pId === false) {
+                                //pId = self.spawn('bullet', 0, 0);
+                                //self.entities[pId].removed = true;
+                                //self.pool.projectile.push(pId);
+                        }
+
                         App.World.map.entities[pId].attrs.x = x;
-                        App.World.map.entities[pId].attrs.x = y;
-                        this.pool[poolName].push(pId);
+                        App.World.map.entities[pId].attrs.y = y;
+                        App.World.map.entities[pId].removed = false;
+
                         return pId;
                 };
 
@@ -651,6 +712,9 @@
                         var cameraId = self.spawn('camera', App.Player.playerEnt.attrs.x - 320, App.Player.playerEnt.attrs.y - 240);
                         self.camera = self.entities[cameraId];
 
+                        // spawn everything else
+                        self.spawnEnemies();
+
                         if(!_.isUndefined(settings.loaded)) {
                                 settings.loaded();
                         }
@@ -662,6 +726,7 @@
                         var pId;
                         for(var i = 0; i < 50; i++) {
                                 pId = self.spawn('bullet', 0, 0);
+                                self.entities[pId].removed = true;
                                 self.pool.projectile.push(pId);
                         }
 
