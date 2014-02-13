@@ -12,9 +12,7 @@
                         speed: 8, 
                         components: {
                                 Renderable: {
-                                        color: '#FF2828', 
-                                        sprites: 'player', 
-                                        shadow: 'shadow_64'
+                                        color: '#1D52C4'
                                 }, 
                                 Movable: {
                                         acceleration: 0.2
@@ -29,6 +27,7 @@
                                 IsPlayer: {
                                 }, 
                                 Hurtable: {
+                                        health: 1
                                 },
                                 HasProjectile: {
                                         name: 'bullet',
@@ -39,12 +38,15 @@
                 }, 
 
                 camera: {
-                        width: 96, 
-                        height: 64, 
+                        width: 32, 
+                        height: 32, 
                         speed: 8, 
                         components: {
+                                //Renderable: {
+                                        //color: 'rgba(255,255,0,0.5)'
+                                //},
                                 Movable: {
-                                        acceleration: 0.4
+                                        acceleration: 0.2
                                 },
                                 IsCamera: {
                                         behavior: function() {
@@ -61,11 +63,13 @@
                                                         xDir = 1;
                                                 }
 
+                                                /*
                                                 if(cCenter.y > pCenter.y && cCenter.y - pCenter.y > this.en.attrs.height / 2) {
                                                         yDir = -1;
                                                 } else if(cCenter.y < pCenter.y && pCenter.y - cCenter.y > this.en.attrs.height / 2) {
                                                         yDir = 1;
                                                 }
+                                                */
 
                                                 this.en.c('Movable').move(xDir, yDir);
                                         }
@@ -86,47 +90,6 @@
                                 Collidable: {
                                 }, 
                                 Projectile: {
-                                }
-                        }
-                }, 
-
-                grunt: {
-                        width: 64, 
-                        height: 64, 
-                        speed: 4, 
-                        components: {
-                                Renderable: {
-                                        color: '#0C0', 
-                                        sprites: 'grunt', 
-                                        shadow: 'shadow_64'
-                                }, 
-                                Movable: {
-                                }, 
-                                Collidable: {
-                                }, 
-                                IsEnemy: {
-                                        behavior: function() {
-                                                var player = App.World.getPlayer(0), 
-                                                    xDir = 0, 
-                                                    yDir = 0, 
-                                                    newPos;
-
-                                                if(this.en.attrs.x > player.attrs.x && this.en.attrs.x - player.attrs.x > 16) {
-                                                        xDir = -1;
-                                                } else if(this.en.attrs.x < player.attrs.x && player.attrs.x - this.en.attrs.x > 16) {
-                                                        xDir = 1;
-                                                }
-
-                                                if(this.en.attrs.y > player.attrs.y && this.en.attrs.y - player.attrs.y > 16) {
-                                                        yDir = -1;
-                                                } else if(this.en.attrs.y < player.attrs.y && player.attrs.y - this.en.attrs.y > 16) {
-                                                        yDir = 1;
-                                                }
-
-                                                this.en.c('Movable').move(xDir, yDir);
-                                        }
-                                }, 
-                                Hurtable: {
                                 }
                         }
                 }

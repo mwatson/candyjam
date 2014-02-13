@@ -212,6 +212,15 @@
                         return attrs.lastPos;
                 };
 
+                this.setLastPos = function(x, y) {
+                        if(x >= 0) {
+                                attrs.lastPos.x = x;
+                        }
+                        if(y >= 0) {
+                                attrs.lastPos.y = y;
+                        }
+                };
+
                 this.move = function(xDir, yDir) {
 
                         var xStep = en.attrs.x, 
@@ -385,6 +394,24 @@
         };
 
         root.App.Objects.Components.IsPlayer = isPlayer;
+
+        var hurtable = function(entity, settings) {
+
+                var en = entity;
+
+                this.health = settings.health;
+
+                this.takeDamage = function(amount) {
+                        this.health -= amount;
+                };
+
+                this.isDead = function() {
+                        return this.health <= 0 ? true : false;
+                };
+        };
+
+        root.App.Objects.Components.Hurtable = hurtable;
+
 
         var projectile = function(entity, settings) {
 

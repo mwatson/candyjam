@@ -10,6 +10,8 @@
                 this.bgGrid = [];
                 this.grid = [];
 
+                this.columns = {};
+
                 this.levelColors = {};
 
                 // not really a quadtree
@@ -75,129 +77,38 @@
                         //var c = document.createElement('canvas');
                 };
 
-                this.regenerateMap = function() {
-                        for(var i = 0; i < this.quadtree.length; i++) {
-                                this.quadtree[i].clear();
-                        }
-
-                        var width  = settings.width, 
-                            height = settings.height;
-
-                        if(App.Draw.get('background').parallax.x < 1) {
-                                width += width * App.Draw.get('background').parallax.x;
-                        }
-
-                        if(App.Draw.get('background').parallax.y < 1) {
-                                height += height * App.Draw.get('background').parallax.y;
-                        }
-
-                        this.createBackgroundGrid(width, height, settings.rows);
-
-                        // respawn the player and sky
-                        this.spawn('player', this.playerSpawn.x, this.playerSpawn.y);
-                        App.Player.setupPlayerEnt();
-                        App.Player.refreshComposites();
-
-                        this.spawnSky(this.width);
-
-                        // generate the map
-                        if(!settings.blockers.length) {
-                                this.grid = this.generateBlockers(settings.width, settings.height, settings.mapSize);     
-                        } else {
-                                this.grid = settings.blockers;
-                        }
-                        this.processGrid();
-
-                        this.generateDMap(
-                                'player', 
-                                [ 
-                                        { x: App.Tools.rand(2, this.width - 2), y: 2 }, 
-                                        { x: App.Tools.rand(2, this.width - 2), y: 2 }
-                                ]
-                        );
-                        this.dPaths.player = [];
-                };
-
                 this.generateBlockers = function(width, height, mapSize) {
                         // generate an empty map grid
                         var grid = [], val, x = 0, y = 0, dir, lastDir = -1;
                         for(y = 0; y < height; y++) {
                                 grid.push([]);
                                 for(x = 0; x < width; x++) {
-                                        grid[y].push(1);
+                                        grid[y].push(0);
                                 }
-                        }
-
-                        x = Math.floor(width / 2);
-                        y = Math.floor(height / 2);
-                        for(var i = 0; i < mapSize; i++) {
-
-                                grid[y][x] = 0;
-                                
-                                while(1) {
-                                        dir = App.Tools.rand(0, 3);
-
-                                        if(dir > 3) {
-                                                if(lastDir < 0) {
-                                                        continue;
-                                                }
-                                                dir = lastDir;
-                                        }
-
-                                        if(dir == 0 && x <= 1) {
-                                                continue;
-                                        }
-                                        if(dir == 1 && x >= width - 2) {
-                                                continue;
-                                        }
-                                        if(dir == 2 && y >= height - 2) {
-                                                continue;
-                                        }
-                                        if(dir == 3 && y <= 1) {
-                                                continue;
-                                        }
-                                        break;
-                                }
-
-                                switch(dir) {
-                                        case 0: // N 
-                                                x -= 1;
-                                                break;
-                                        case 1: // S
-                                                x += 1;
-                                                break;
-                                        case 2: // W
-                                                y += 1;
-                                                break;
-                                        case 3: // E
-                                                y -= 1;
-                                                break;
-                                }
-
-                                lastDir = dir;
                         }
 
                         // some post-processing (fill in two two surrounding rows)
                         for(y = 0; y < height; y++) {
                                 for(x = 0; x < width; x++) {
-                                        if(y <= 1 || x <= 1) {
+                                        if(y < 1 || x < 1) {
                                                 grid[y][x] = 1;
                                         }
 
-                                        if(y >= height - 2 || x >= width - 2) {
+                                        if(y > height - 2 || x > width - 2) {
                                                 grid[y][x] = 1;
                                         }
                                 }
                         }
 
-                        if(App.Game.settings.debug.drawTextMap) {
-                                var row;
-                                for(y = 0; y < height; y++) {
-                                        row = '';
-                                        for(x = 0; x < width; x++) {
-                                                row += grid[y][x] ? '#' : '-';
-                                        }
-                                        App.Tools.log(row);
+                        // add in columns (evenly spaced)
+                        for(y = 0; y < height; y++) {
+                                if(y > 1 && y < 7) {
+                                        continue;
+                                }
+
+                                for(x = 4; x < width; x += 4) {
+                                        this.columns['col_' + y] = y;
+                                        grid[y][x] = 1;
                                 }
                         }
 
@@ -215,200 +126,6 @@
                                         }
                                 }
                         }
-                };
-
-                this.spawnEnemies = function() {
-                        var sideCt, 
-                            enemies = 4;
-                        for(var y = 0; y < this.grid.length; y++) {
-                                for(var x = 0; x < this.grid[y].length; x++) {
-                                        sideCt = 0;
-
-                                        if(!_.isUndefined(this.grid[y][x + 1])) {
-                                                if(!this.grid[y][x + 1]) {
-                                                        sideCt++;
-                                                }
-                                        }
-                                        if(!_.isUndefined(this.grid[y][x - 1])) {
-                                                if(!this.grid[y][x - 1]) {
-                                                        sideCt++;
-                                                }
-                                        }
-                                        if(!_.isUndefined(this.grid[y + 1])) {
-                                                if(!this.grid[y + 1][x]) {
-                                                        sideCt++;
-                                                }
-                                        }
-                                        if(!_.isUndefined(this.grid[y - 1])) {
-                                                if(!this.grid[y - 1][x]) {
-                                                        sideCt++;
-                                                }
-                                        }
-
-                                        if(sideCt == 3 && App.Tools.rand(0, 100) < 25) {
-                                                console.log('spawning grunt at ' + x + ' ' + y);
-                                                this.spawn(
-                                                        'grunt', 
-                                                        x * settings.tileSize, 
-                                                        y * settings.tileSize
-                                                );
-                                                enemies--;
-                                        }
-
-                                        if(enemies <= 0) {
-                                                return;
-                                        }
-                                }
-                        }
-                };
-
-                // generate a path using the specified map
-                this.generatePath = function(map, start) {
-                        if(_.isUndefined(this.dMaps[map])) {
-                                return [];
-                        }
-
-                        var dm = this.dMaps[map], 
-                            newSt = start, 
-                            st, 
-                            max = 1000;
-
-                        this.dPaths[map] = [];
-
-                        // check all adjacent squares and take the first lower value one
-                        while(1) {
-
-                                if(_.isUndefined(dm[newSt.y])) {
-                                        break;
-                                }
-
-                                if(_.isUndefined(dm[newSt.y][newSt.x])) {
-                                        break;
-                                }
-
-                                if(dm[newSt.y][newSt.x] === 0) {
-                                        break;
-                                }
-
-                                st = { x: newSt.x, y: newSt.y };
-                                for(var y = -1; y <= 1; y++) {
-
-                                        if(_.isUndefined(dm[newSt.y + y])) {
-                                                continue;
-                                        }
-
-                                        for(var x = -1; x <= 1; x++) {
-
-                                                if(x === 0 && y === 0) {
-                                                        continue;
-                                                }
-
-                                                if(_.isUndefined(dm[newSt.y + y][newSt.x + x])) {
-                                                        continue;
-                                                }
-
-                                                if(dm[newSt.y + y][newSt.x + x] < dm[st.y][st.x]) {
-                                                        st.x = newSt.x + x;
-                                                        st.y = newSt.y + y;
-                                                }
-                                        }
-                                }
-
-                                this.dPaths[map].push(st);
-
-                                newSt.x = st.x;
-                                newSt.y = st.y;
-
-                                max--;
-
-                                if(max <= 0) {
-                                        break;
-                                }
-                        }
-                };
-
-                this.generateDMap = function(item, goals) {
-
-                        // first generate an empty grid
-                        var grid = [], val, x = 0, y = 0, h = false;
-                        for(y = 0; y < this.height; y++) {
-                                grid.push([]);
-                                for(x = 0; x < this.width; x++) {
-                                        grid[y].push(1000);
-                                }
-                        }
-
-                        // set up the goal squares
-                        for(var i = 0; i < goals.length; i++) {
-                                x = goals[i].x;
-                                y = goals[i].y;
-                                grid[y][x] = 0;
-                        }
-
-                        
-                        var s, lv, ch, its = 0;
-                        while(1) {
-                                ch = 0;
-                                // start at 2 because the top two rows are inaccessible
-                                for(y = 2; y < grid.length; y++) {
-                                        for(x = 0; x < grid[y].length; x++) {
-
-                                                if(this.grid[y][x] !== false) {
-                                                        continue;
-                                                }
-
-                                                lv = 1000;
-                                                if(!_.isUndefined(grid[y][x + 1])) {
-                                                        if(grid[y][x + 1] < lv) {
-                                                                lv = grid[y][x + 1];
-                                                        }
-                                                }
-                                                if(!_.isUndefined(grid[y][x - 1])) {
-                                                        if(grid[y][x - 1] < lv) {
-                                                                lv = grid[y][x - 1];
-                                                        }
-                                                }
-
-                                                if(!_.isUndefined(grid[y + 1])) {
-                                                        if(!_.isUndefined(grid[y + 1][x + 1])) {
-                                                                if(grid[y + 1][x + 1] < lv) {
-                                                                        lv = grid[y + 1][x + 1];
-                                                                }
-                                                        }
-                                                        if(!_.isUndefined(grid[y + 1][x - 1])) {
-                                                                if(grid[y + 1][x - 1] < lv) {
-                                                                        lv = grid[y + 1][x - 1];
-                                                                }
-                                                        }
-                                                }
-                                                if(!_.isUndefined(grid[y - 1])) {
-                                                        if(!_.isUndefined(grid[y - 1][x + 1])) {
-                                                                if(grid[y - 1][x + 1] < lv) {
-                                                                        lv = grid[y - 1][x + 1];
-                                                                }
-                                                        }
-                                                        if(!_.isUndefined(grid[y - 1][x - 1])) {
-                                                                if(grid[y - 1][x - 1] < lv) {
-                                                                        lv = grid[y - 1][x - 1];
-                                                                }
-                                                        }
-                                                }
-
-                                                if(grid[y][x] >= lv + 2) {
-                                                        grid[y][x] = lv + 1;
-                                                        ch++;
-                                                }
-                                        }
-                                }
-
-                                its++;
-
-                                if(!ch || its > 1000) {
-                                        break;
-                                }
-                        }
-
-                        this.dMaps[item] = grid;
                 };
 
                 this.draw = function(interpolation, moveDelta) {
@@ -445,36 +162,10 @@
                                         if(this.grid[y][x]) {
                                                 App.Draw.get('entity').fillRect(
                                                         x * this.tileSize,
-                                                        y * this.tileSize - 32,
+                                                        y * this.tileSize,
                                                         this.tileSize, 
                                                         this.tileSize, 
                                                         this.levelColors.main
-                                                );
-
-                                                // if there's a tile directly below we can skip drawing
-                                                if(y < this.grid[y].length - 1 && this.grid[y + 1][x]) {
-                                                        continue;
-                                                }
-
-                                                App.Draw.get('background').fillRect(
-                                                        x * this.tileSize,
-                                                        (y * this.tileSize - 32) + this.tileSize,
-                                                        this.tileSize, 
-                                                        64, 
-                                                        y >= this.grid[y].length - 1 ? this.levelColors.main : this.levelColors.side
-                                                );
-
-                                                if(y >= this.grid[y].length - 1) {
-                                                        continue;
-                                                }
-                                                
-                                                // Shadow
-                                                App.Draw.get('background').fillRect(
-                                                        x * this.tileSize,
-                                                        (y * this.tileSize - 32) + this.tileSize + 64,
-                                                        this.tileSize, 
-                                                        24, 
-                                                        'rgba(0,0,0,0.25)'
                                                 );
                                         }
                                 }
@@ -709,11 +400,15 @@
                         App.Player.playerEnt = self.entities[playerId];
 
                         // spawn the camera
-                        var cameraId = self.spawn('camera', App.Player.playerEnt.attrs.x - 320, App.Player.playerEnt.attrs.y - 240);
+                        var cameraId = self.spawn(
+                                'camera',
+                                App.Player.playerEnt.attrs.x,
+                                App.Player.playerEnt.attrs.y
+                        );
                         self.camera = self.entities[cameraId];
 
                         // spawn everything else
-                        self.spawnEnemies();
+                        //self.spawnEnemies();
 
                         if(!_.isUndefined(settings.loaded)) {
                                 settings.loaded();

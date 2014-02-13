@@ -174,12 +174,6 @@
 
                         App.World.map.draw(interpolation, moveDelta);
 
-                        App.Draw.get('hud').drawImg(
-                                'crosshair01', 
-                                App.Controls.mouseCursor().x, 
-                                App.Controls.mouseCursor().y
-                        );
-
                         if(App.Game.settings.debug.fps) {
                                 App.Tools.printFPS('hud', App.Game.loopInfo);
                                 App.Tools.printPlayerPos('hud', App.World.getPlayer());
@@ -283,20 +277,19 @@
 
                 this.playerOps = function() {
                         var player = App.World.getPlayer(0), 
+                            camera = App.World.getCamera(), 
                             xDir = 0, 
                             yDir = 0, 
                             newPos = {}, 
                             collisions = [], 
-                            cursor;
+                            cursor, 
+                            diff;
 
-                        if(App.Controls.keyDown('A') || App.Controls.keyDown('ARROW_LEFT')) {
-                                xDir -= 1;
-                        }
-                        if(App.Controls.keyDown('D') || App.Controls.keyDown('ARROW_RIGHT')) {
-                                xDir += 1;
-                        }
+                        xDir = 1;
+                        yDir = 1;
+
                         if(App.Controls.keyDown('W') || App.Controls.keyDown('ARROW_UP')) {
-                                yDir -= 1;
+                                yDir -= 2;
                         }
                         if(App.Controls.keyDown('S') || App.Controls.keyDown('ARROW_DOWN')) {
                                 yDir += 1;
@@ -311,7 +304,23 @@
                         if(App.Controls.mouseClick('BUTTON_RIGHT')) {
                         }
 
+                        if(player.c('Hurtable').isDead()) {
+                                yDir = 1;
+                                xDir = 0;
+                        }
+
+                        if(player.attrs.x > 24 * 64) {
+                                diff = player.attrs.x - 24 * 64;
+                                player.c('Movable').setLastPos(8 * 64 + diff - 10, -1);
+                                player.attrs.x = 8 * 64 + diff;
+                                camera.attrs.x = 8 * 64 + diff;
+                        }
+
                         newPos = player.c('Movable').move(xDir, yDir);
+
+                        if(newPos.collisions.length) {
+                                player.c('Hurtable').takeDamage(1);
+                        }
                 };
         };
         

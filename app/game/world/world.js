@@ -33,6 +33,10 @@
                         return this.map.entities[0];
                 };
 
+                this.getCamera = function() {
+                        return this.map.entities[1];
+                };
+
                 this.init = (function(settings, self){
                         maps = settings;
                         self.loadMap(0);

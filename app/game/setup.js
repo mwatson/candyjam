@@ -15,6 +15,7 @@ App.init = function() {
                         { 
                                 id: 'background', 
                                 origin: 'dynamic', 
+                                parallax: { x: 0.75, y: 0.75 },
                                 style: { 
                                         position: 'absolute', 
                                         top: '50%', 
@@ -141,92 +142,29 @@ App.init = function() {
                 // the maps
                 world: [{
 
-                        tileSize: 96, 
+                        tileSize: 64, 
                         width: 32, 
-                        height: 32, 
+                        height: 9, 
 
                         mapSize: 1000, 
                         
                         playerStart: {
-                                x: 16 * 96, 
-                                y: 16 * 96
+                                x: 8 * 64, 
+                                y: 4 * 64
                         }, 
 
                         // define the colors of the bg tiles
                         rows: [
-                                { depth: 0,  fgColor: '#F2B6B6', bgColor: '#EDCCCC' }, 
+                                { depth: 0,  fgColor: '#A8BDED', bgColor: '#C5CFE6' }, 
                         ], 
 
                         colors: {
-                                main: '#D60000',
-                                side: '#660000'
+                                main: '#2573B3'
                         }, 
 
                         enemies: {
                                 max: 2, 
                                 min: 1
-                        }, 
-
-                        blockers: [], 
-
-                        bounds: {}, 
-
-                        loaded: function() {
-                                App.Draw.forceOrigin(0, 0);
-                        }
-                },
-                {
-
-                        tileSize: 96, 
-                        width: 32, 
-                        height: 32, 
-
-                        mapSize: 1500, 
-                        
-                        playerStart: {
-                                x: 16 * 96, 
-                                y: 16 * 96
-                        }, 
-
-                        // define the colors of the bg tiles
-                        rows: [
-                                { depth: 0,  fgColor: '#B6ECF2', bgColor: '#CCD8ED' }, 
-                        ], 
-
-                        colors: {
-                                main: '#006BD6',
-                                side: '#003066'
-                        }, 
-
-                        blockers: [], 
-
-                        bounds: {}, 
-
-                        loaded: function() {
-                                App.Draw.forceOrigin(0, 0);
-                        }
-                }, 
-                {
-
-                        tileSize: 96, 
-                        width: 32, 
-                        height: 32, 
-
-                        mapSize: 2000, 
-                        
-                        playerStart: {
-                                x: 16 * 96, 
-                                y: 16 * 96
-                        }, 
-
-                        // define the colors of the bg tiles
-                        rows: [
-                                { depth: 0,  fgColor: '#F2B6B6', bgColor: '#EDCCCC' }, 
-                        ], 
-
-                        colors: {
-                                main: '#D60000',
-                                side: '#660000'
                         }, 
 
                         blockers: [], 
